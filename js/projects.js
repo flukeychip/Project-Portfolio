@@ -44,7 +44,7 @@ const projects = [
     skills: ["Computer Vision", "AprilTag Detection", "Homography Calibration", "Projective Geometry"],
     model: null,
     videos: [
-      "AR%20pingpong/Looping%20cover%20video.mov"
+      "AR%20pingpong/ar-cover.mp4"
     ],
     images: [],
     timeline: [
@@ -76,7 +76,7 @@ const projects = [
     skills: ["GRBL", "Stepper Motors", "CAD", "Laser Control", "Motion Control", "3D Printing"],
     model: "2%20axis%20laser%20engraver/laser-engraver.glb",
     videos: [
-      "2%20axis%20laser%20engraver/IMG_1022.mov"
+      "2%20axis%20laser%20engraver/laser-engraver-demo.mp4"
     ],
     images: [],
     timeline: [
