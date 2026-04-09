@@ -33,7 +33,13 @@ const projects = [
     images: [
       "6dof%20arm/Screenshot%202026-03-04%20224359.png"
     ],
-    timeline: [],
+    timeline: [
+      { src: "Analog%20heart%20beat%20detector/Choosing%20wavelength%20to%20read%20bloodflow.png", label: "Choosing right wavelength" },
+      { src: "Analog%20heart%20beat%20detector/Design%20of%20first%20filer.png", label: "Design of first filter" },
+      { src: "Analog%20heart%20beat%20detector/Design%20of%20second%20filter.png", label: "Design of second filter" },
+      { src: "Analog%20heart%20beat%20detector/Convert%20analog%20signal%20to%20digital.png", label: "Convert analog to digital" },
+      { src: "Analog%20heart%20beat%20detector/Display%20digital%20signal%20on%20led.png", label: "Display sigital signal" }
+    ],
     files: []
   },
   {
