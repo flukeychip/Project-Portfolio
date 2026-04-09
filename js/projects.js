@@ -46,7 +46,10 @@ const projects = [
     videos: [
       "AR%20pingpong/Looping%20cover%20video.mov"
     ],
-    images: [],
+    images: [
+      "Analog%20heart%20beat%20detector/Oscilscope%20with%20ADC.png",
+      "Analog%20heart%20beat%20detector/Complete%20Schmatic.png"
+    ],
     timeline: [
       { src: "AR%20pingpong/Unable%20to%20get%20CV%20to%20recgonize%20anything.png", label: "Initial Setup"      },
       { src: "AR%20pingpong/Still%20struggling%20to%20get%20CV%20to%20work.png",     label: "Debugging"          },
