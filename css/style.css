@@ -514,12 +514,13 @@ nav {
   flex-shrink: 0;
   width: 160px;
   cursor: default;
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   transform-origin: bottom center;
 }
 
 .timeline-item:hover {
-  transform: scale(1.35);
+  width: 260px;
+  transform: translateY(-8px);
   z-index: 10;
 }
 
@@ -530,10 +531,13 @@ nav {
   border-radius: 6px;
   border: 1px solid var(--border);
   display: block;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  background: #fff;
+  transition: height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), object-fit 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .timeline-item:hover img {
+  height: 170px;
+  object-fit: contain;
   border-color: var(--accent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
