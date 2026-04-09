@@ -218,6 +218,9 @@ const projects = [
     description: "When I started this project, I assumed it would take a week to finish. However, we kept adding features and improving it, and I ended up designing a custom PCB for it. It uses two stepper motors and OpenCV, and it also runs a small deep-learning ReID model to identify people and associate faces with names. It calculates a person's acceleration, subtracts the system's own movement, and predicts where the person will be.",
     skills: ["Stepper Control", "CAD", "3D Printing", "Computer Vision", "PID Tuning", "PCB Design"],
     model: null,
+    videos: [
+      "PanTilt/pantilt-demo.mp4"
+    ],
     images: [],
     timeline: [],
     files: []
