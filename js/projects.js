@@ -33,13 +33,7 @@ const projects = [
     images: [
       "6dof%20arm/Screenshot%202026-03-04%20224359.png"
     ],
-    timeline: [
-      { src: "Analog%20heart%20beat%20detector/Choosing%20wavelength%20to%20read%20bloodflow.png", label: "Choosing right wavelength" },
-      { src: "Analog%20heart%20beat%20detector/Design%20of%20first%20filer.png", label: "Design of first filter" },
-      { src: "Analog%20heart%20beat%20detector/Design%20of%20second%20filter.png", label: "Design of second filter" },
-      { src: "Analog%20heart%20beat%20detector/Convert%20analog%20signal%20to%20digital.png", label: "Convert analog to digital" },
-      { src: "Analog%20heart%20beat%20detector/Display%20digital%20signal%20on%20led.png", label: "Display sigital signal" }
-    ],
+    timeline: [],
     files: []
   },
   {
@@ -52,10 +46,7 @@ const projects = [
     videos: [
       "AR%20pingpong/Looping%20cover%20video.mov"
     ],
-    images: [
-      "Analog%20heart%20beat%20detector/Oscilscope%20with%20ADC.png",
-      "Analog%20heart%20beat%20detector/Complete%20Schmatic.png"
-    ],
+    images: [],
     timeline: [
       { src: "AR%20pingpong/Unable%20to%20get%20CV%20to%20recgonize%20anything.png", label: "Initial Setup"      },
       { src: "AR%20pingpong/Still%20struggling%20to%20get%20CV%20to%20work.png",     label: "Debugging"          },
@@ -176,8 +167,17 @@ const projects = [
     description: "This is the only school-required project I have on here because I thought it was so cool. We were given a bucket of ICs and passive components and told we needed to build a circuit that would flash an LED every time your heart beat. Other than that, we were given a few constraints but not told how to actually build it. I thought the freedom to choose how it was built and what to use was really cool, and a good preview of what industry would actually be like.",
     skills: ["Op-Amps", "Analog Filters", "PCB Design", "Signal Conditioning"],
     model: null,
-    images: [],
-    timeline: [],
+    images: [
+      "Analog%20heart%20beat%20detector/Oscilscope%20with%20ADC.png",
+      "Analog%20heart%20beat%20detector/Complete%20Schmatic.png"
+    ],
+    timeline: [
+      { src: "Analog%20heart%20beat%20detector/Choosing%20wavelength%20to%20read%20bloodflow.png", label: "Choosing right wavelength" },
+      { src: "Analog%20heart%20beat%20detector/Design%20of%20first%20filer.png", label: "Design of first filter" },
+      { src: "Analog%20heart%20beat%20detector/Design%20of%20second%20filter.png", label: "Design of second filter" },
+      { src: "Analog%20heart%20beat%20detector/Convert%20analog%20signal%20to%20digital.png", label: "Convert analog to digital" },
+      { src: "Analog%20heart%20beat%20detector/Display%20digital%20signal%20on%20led.png", label: "Display sigital signal" }
+    ],
     files: []
   },
   {
