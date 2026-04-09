@@ -19,30 +19,40 @@
       this.mouseListener = null;
       this.visible = false;
       this.observer = null;
+      this.resizeObserver = null;
+    }
+
+    resize() {
+      if (!this.container || !this.camera || !this.renderer) return;
+      const width = Math.max(1, this.container.clientWidth);
+      const height = Math.max(1, this.container.clientHeight);
+      const aspect = width / height;
+      const frustumSize = 6;
+      this.camera.left = -frustumSize * aspect / 2;
+      this.camera.right = frustumSize * aspect / 2;
+      this.camera.top = frustumSize / 2;
+      this.camera.bottom = -frustumSize / 2;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(width, height);
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     }
 
     init() {
-      const width = this.container.clientWidth;
-      const height = this.container.clientHeight;
-
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0xFAFAFC);
 
-      // Orthographic camera — frustum in world units, not pixels
-      // Model is auto-scaled to 4 world units; frustum covers ~6 units so model fills ~67%
-      const aspect = width / height;
+      // Orthographic camera — frustum updated in resize(); placeholder until first layout
       const frustumSize = 6;
       this.camera = new THREE.OrthographicCamera(
-        -frustumSize * aspect / 2, frustumSize * aspect / 2,
+        -frustumSize / 2, frustumSize / 2,
         frustumSize / 2, -frustumSize / 2,
         0.1, 1000
       );
       this.camera.position.z = 10;
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
-      this.renderer.setSize(width, height);
-      this.renderer.setPixelRatio(window.devicePixelRatio);
       this.container.appendChild(this.renderer.domElement);
+      this.resize();
 
       // Lighting
       const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -65,9 +75,23 @@
       // Only animate when visible in viewport
       this.observer = new IntersectionObserver((entries) => {
         this.visible = entries[0].isIntersecting;
-        if (this.visible && !this.animationId) this.animate();
-      }, { threshold: 0.1 });
+        if (this.visible) {
+          this.resize();
+          if (!this.animationId) this.animate();
+        }
+      }, { threshold: 0.01, rootMargin: '0px 0px 10% 0px' });
       this.observer.observe(this.container);
+
+      // Fix 0×0 canvas when the gallery lays out after paint (common on GitHub Pages)
+      this.resizeObserver = new ResizeObserver(function () {
+        this.resize();
+        if (this.visible && this.model) this.renderer.render(this.scene, this.camera);
+      }.bind(this));
+      this.resizeObserver.observe(this.container);
+      requestAnimationFrame(function () {
+        this.resize();
+        if (this.visible && this.model) this.renderer.render(this.scene, this.camera);
+      }.bind(this));
     }
 
     loadModel(modelPath) {
@@ -93,8 +117,9 @@
           this.model.scale.setScalar(scale);
           this.model.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
 
-          // Kick the render loop in case viewer is already visible
+          this.resize();
           if (this.visible && !this.animationId) this.animate();
+          else if (this.visible) this.renderer.render(this.scene, this.camera);
         },
         undefined,
         (error) => console.error('Model load error:', error)
@@ -122,6 +147,7 @@
       this.visible = false;
       if (this.animationId) cancelAnimationFrame(this.animationId);
       if (this.observer) { this.observer.disconnect(); this.observer = null; }
+      if (this.resizeObserver) { this.resizeObserver.disconnect(); this.resizeObserver = null; }
 
       // Remove mouse listener
       if (this.mouseListener) {
