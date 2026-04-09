@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EE Portfolio</title>
+  <meta name="description" content="Electrical engineering portfolio — hardware projects, PCB design, embedded systems." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=22" />
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <a href="#" class="nav-logo">Portfolio</a>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-text">
+        <p class="hero-label">Electrical Engineering</p>
+        <h1>Engineering with Purpose</h1>
+        <p>Edit this description. You can change the hero text, add your tagline, and describe your engineering focus.</p>
+        <a href="#work" class="btn-primary">View Selected Works</a>
+      </div>
+      <div class="hero-image">
+        <div style="width: 340px; height: 340px; border-radius: 50%; background: #E5E5E5; border: 6px solid #111111; display: flex; align-items: center; justify-content: center; color: #999; font-size: 0.9rem;">Add your photo here</div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- PROJECTS CAROUSEL -->
+  <section id="work" class="carousel-section">
+    <div class="carousel-container" id="carousel">
+      <!-- Rendered by main.js from projects.js -->
+    </div>
+  </section>
+
+  <!-- SCROLL SPACER: height set by JS to position project details at screen bottom on load -->
+  <div id="scroll-spacer"></div>
+
+  <!-- PROJECT DETAIL SECTIONS -->
+  <div id="project-details">
+    <!-- Rendered by main.js from projects.js -->
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="about-section">
+    <div class="about-grid">
+      <div class="about-img">
+        <div style="background: #E5E5E5; width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; color: #999; border-radius: 12px;">Add your photo here</div>
+      </div>
+      <div class="about-content">
+        <h2>About Me</h2>
+        <p>
+          Add your bio here. Tell employers about your engineering background, what drives you, and what you're passionate about building.
+        </p>
+        <p>
+          Share your experience, education, and what makes you unique as an engineer. This is your chance to showcase not just what you've built, but why you build it.
+        </p>
+        <div class="about-box">
+          <ul>
+            <li><strong>Expertise:</strong> Hardware development, robotics, embedded systems</li>
+            <li><strong>Currently:</strong>  AI, Machine Learning, Local AI, Computer Vision</li>
+            <li><strong>Location:</strong> Dallas, TX</li>
+          </ul>
+        </div>
+        <div class="about-buttons">
+          <a href="#" class="btn">View Resume</a>
+          <a href="mailto:your-email@example.com" class="btn btn-outline">Email Me</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <span>Electrical Engineering Portfolio</span>
+      <a href="#">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="lib/three.min.js?v=2"></script>
+  <script src="lib/GLTFLoader.js?v=2"></script>
+  <script src="lib/OrbitControls.js?v=2"></script>
+
+  <script src="js/projects.js?v=25"></script>
+  <script src="js/main.js?v=43"></script>
+</body>
+</html>

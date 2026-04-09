@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \":*)",
+      "Bash(curl -o three.min.js \"https://cdn.jsdelivr.net/npm/three@r128/build/three.min.js\")",
+      "Bash(curl -o GLTFLoader.js \"https://cdn.jsdelivr.net/npm/three@r128/examples/js/loaders/GLTFLoader.js\")",
+      "Bash(curl -o OrbitControls.js \"https://cdn.jsdelivr.net/npm/three@r128/examples/js/controls/OrbitControls.js\")",
+      "Bash(curl -o three.min.js \"https://unpkg.com/three@r128/build/three.min.js\" -L)",
+      "Bash(curl -o GLTFLoader.js \"https://unpkg.com/three@r128/examples/js/loaders/GLTFLoader.js\" -L)",
+      "Bash(curl -o OrbitControls.js \"https://unpkg.com/three@r128/examples/js/controls/OrbitControls.js\" -L)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "Bash(npm list:*)",
+      "Bash(du -sh \"C:/Users/karen/OneDrive/Desktop/Portfoloio/lib\"/*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -o GLTFLoader.js \"https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js\")",
+      "Bash(curl -o OrbitControls.js \"https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js\")",
+      "Bash(curl -o three.min.js \"https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js\")",
+      "Bash(python -c \":*)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Users/karen/OneDrive/Desktop/Portfoloio/**)",
+      "Bash(grep -v \"^$\")",
+      "Bash(done)",
+      "Bash(python convert_3d.py)",
+      "Bash(node convert-3mf-to-glb.js)",
+      "Bash(node convert-3mf-to-glb.js \"2 axis laser engraver/Laser engraver.3mf\" \"2 axis laser engraver/laser-engraver.glb\")",
+      "Bash(ls -d */)"
+    ]
+  }
+}
