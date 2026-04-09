@@ -58,7 +58,6 @@ nav {
   font-weight: 800;
   font-size: 1.2rem;
   letter-spacing: 1px;
-  text-transform: uppercase;
   text-decoration: none;
   color: var(--text-main);
 }
