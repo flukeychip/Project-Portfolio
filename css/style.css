@@ -157,7 +157,7 @@ nav {
   max-width: none;
   object-fit: cover;
   object-position: 52% 40%;
-  transform: translate(-50%, -50%) translate(-18px, -22px);
+  transform: translate(-50%, -50%) translate(14px, -22px);
   display: block;
 }
 
