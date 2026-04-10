@@ -197,8 +197,8 @@ const projects = [
   {
     id: "necklace-organizer",
     name: "Necklace Organizer",
-    tagline: "Precision-designed parametric organizer",
-    description: "This started as a request from my little sister to organize all her necklaces while traveling. After massively over-engineering the first version (print-in-place ratcheting mechanism with a release button), I refined it into something that accomplished the same task while taking less time to print and was similar to use.",
+    tagline: "Flexible, easy-to-use jewelry organizer",
+    description: "This started as a request from my little sister to organize all her necklaces while traveling. After massively over-engineering the first version—a print-in-place ratcheting mechanism with a release button—I refined it into a design that does the same job with shorter print times and comparable ease of use.",
     skills: ["CAD", "Fusion 360", "3D Printing", "Parametric Design"],
     model: null,
     images: [
