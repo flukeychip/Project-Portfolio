@@ -519,7 +519,7 @@ nav {
 }
 
 .timeline-item:hover {
-  width: 260px;
+  width: 184px;
   transform: translateY(-8px);
   z-index: 10;
 }
@@ -536,7 +536,7 @@ nav {
 }
 
 .timeline-item:hover img {
-  height: 170px;
+  height: 127px;
   object-fit: contain;
   border-color: var(--accent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
