@@ -138,13 +138,27 @@ nav {
   flex-shrink: 0;
 }
 
-.hero-image img {
+.hero-portrait-frame {
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
   border: 6px solid var(--text-main);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.hero-portrait-frame img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 118%;
+  height: 118%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 52% 40%;
+  transform: translate(-50%, -50%) translate(-18px, -22px);
+  display: block;
 }
 
 .scroll-indicator {
