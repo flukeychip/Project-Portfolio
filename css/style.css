@@ -519,7 +519,7 @@ nav {
 }
 
 .timeline-item:hover {
-  width: 230px;
+  width: 300px;
   transform: translateY(-8px);
   z-index: 10;
 }
