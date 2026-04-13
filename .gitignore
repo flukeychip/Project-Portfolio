@@ -1,0 +1,9 @@
+# Raw video source files — converted .mp4 versions are used instead
+*.mov
+*.MOV
+
+# Local staging area for new project folders (not committed)
+staging/
+
+# Local agent/project context file (never committed)
+CONTEXT.md

@@ -5,6 +5,49 @@
   const projectsContainer = document.getElementById('project-details');
   let carouselScrollLocked = false;
 
+  function toAssetPath(pathValue) {
+    if (!pathValue || typeof pathValue !== 'string') return pathValue;
+    if (
+      pathValue.startsWith('assets/') ||
+      pathValue.startsWith('http://') ||
+      pathValue.startsWith('https://') ||
+      pathValue.startsWith('data:')
+    ) {
+      return pathValue;
+    }
+    return 'assets/' + pathValue;
+  }
+
+  function normalizeProjectPaths(project) {
+    return Object.assign({}, project, {
+      model: toAssetPath(project.model),
+      images: (project.images || []).map(toAssetPath),
+      videos: (project.videos || []).map(toAssetPath),
+      files: (project.files || []).map(function (file) {
+        return Object.assign({}, file, { url: toAssetPath(file.url) });
+      }),
+      timeline: (project.timeline || []).map(function (item) {
+        if (typeof item === 'string') return toAssetPath(item);
+        if (!item || typeof item !== 'object') return item;
+        return Object.assign({}, item, { src: toAssetPath(item.src) });
+      })
+    });
+  }
+
+  const normalizedProjects = projects.map(normalizeProjectPaths);
+
+  // ── 3D Script Loader ───────────────────────────────────────
+  function loadScriptsSequential(urls, callback) {
+    function loadNext(i) {
+      if (i >= urls.length) { callback(); return; }
+      var s = document.createElement('script');
+      s.src = urls[i];
+      s.onload = function () { loadNext(i + 1); };
+      document.head.appendChild(s);
+    }
+    loadNext(0);
+  }
+
   // ── 3D Viewer Class with Mouse Tracking ───────────────────
   class Viewer3D {
     constructor(containerElement) {
@@ -16,6 +59,7 @@
       this.animationId = null;
       this.targetRotationX = 0;
       this.targetRotationY = 0;
+      this.baseRotationY = 0;
       this.mouseListener = null;
       this.visible = false;
       this.observer = null;
@@ -67,7 +111,7 @@
         const rect = this.container.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width * 2 - 1;   // -1 to 1
         const y = -(e.clientY - rect.top) / rect.height * 2 + 1;  // -1 to 1
-        this.targetRotationY = x * Math.PI / 4;   // ±45 degrees
+        this.targetRotationY = this.baseRotationY + x * Math.PI / 4;   // ±45 degrees from base
         this.targetRotationX = y * Math.PI / 6;   // ±30 degrees
       };
       document.addEventListener('mousemove', this.mouseListener);
@@ -105,6 +149,8 @@
 
           // Apply rotation first (floor-mounted orientation)
           this.model.rotation.y = Math.PI / 2;
+          this.baseRotationY = Math.PI / 2;
+          this.targetRotationY = Math.PI / 2;
 
           // Now compute bounding box with rotation applied
           const box = new THREE.Box3().setFromObject(this.model);
@@ -169,7 +215,7 @@
   }
 
   // ── Render Carousel ────────────────────────────────────────
-  projects.forEach(function (p) {
+  normalizedProjects.forEach(function (p) {
     const card = document.createElement('a');
     card.href = '#' + p.id;
     card.className = 'carousel-card';
@@ -353,10 +399,11 @@
     if (!inCarouselMode) return;
     e.preventDefault();
 
-    carousel.scrollLeft += e.deltaY;
+    var delta = e.deltaX + e.deltaY;
+    carousel.scrollLeft += delta;
     var maxScroll = carousel.scrollWidth - carousel.clientWidth;
 
-    if (e.deltaY < 0 && carousel.scrollLeft <= 0) {
+    if (delta < 0 && carousel.scrollLeft <= 0) {
       carousel.scrollLeft = 0;
       inCarouselMode = false;
       carouselDone = false;
@@ -368,7 +415,9 @@
   }, { passive: false });
 
   // ── Render Project Details ─────────────────────────────────
-  projects.forEach(function (p, idx) {
+  var pending3D = [];
+
+  normalizedProjects.forEach(function (p, idx) {
     const section = document.createElement('section');
     section.className = 'project-detail';
     section.id = p.id;
@@ -477,15 +526,27 @@
     section.mediaArray = mediaArray;
     section.currentMediaIndex = 0;
 
-    // Initialize 3D viewer if first media is 3D
+    // Queue 3D viewer init — scripts loaded after this loop
     if (mediaArray.length > 0 && mediaArray[0].type === '3d') {
-      var viewerContainer = document.getElementById('3d-' + p.id);
-      var viewer = new Viewer3D(viewerContainer);
-      viewer.init();
-      viewer.loadModel(mediaArray[0].src);
-      section.viewer3d = viewer;
+      pending3D.push({ section: section, src: mediaArray[0].src });
     }
   });
+
+  // Load Three.js only if at least one project has a 3D model
+  if (pending3D.length > 0) {
+    loadScriptsSequential(
+      ['lib/three.min.js?v=2', 'lib/GLTFLoader.js?v=2'],
+      function () {
+        pending3D.forEach(function (item) {
+          var container = document.getElementById('3d-' + item.section.id);
+          var viewer = new Viewer3D(container);
+          viewer.init();
+          viewer.loadModel(item.src);
+          item.section.viewer3d = viewer;
+        });
+      }
+    );
+  }
 
   // ── Timeline Toggle ────────────────────────────────────────
   document.addEventListener('click', function(e) {

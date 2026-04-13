@@ -3,9 +3,11 @@
 // ============================================================
 //
 //  HOW TO ADD PHOTOS:
-//    - Put images in the project's existing subfolder (e.g. "6dof arm/")
-//    - Add the path to the "images" array below (spaces become %20)
+//    - Put new project media in "staging/<project-folder>/"
+//    - Run: powershell -ExecutionPolicy Bypass -File scripts/sync-assets.ps1
+//    - Keep paths here relative to project folder (spaces become %20)
 //      e.g.  images: ["6dof%20arm/photo1.jpg", "6dof%20arm/photo2.jpg"]
+//    - The site auto-resolves these to "assets/<...>" at runtime
 //
 //  HOW TO ADD TIMELINE / PROGRESS PHOTOS:
 //    - Add build progress shots to the "timeline" array
