@@ -510,7 +510,6 @@
           '<h4>About</h4>' +
           '<p>' + p.description + '</p>' +
           '<div class="skills-section">' +
-            '<div class="skills-header">Skills</div>' +
             '<div class="skills-grid">' + skillsHTML + '</div>' +
           '</div>' +
         '</div>' +

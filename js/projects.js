@@ -41,7 +41,7 @@ const projects = [
   {
     id: "ar-physics-simulation",
     name: "AR Physics Simulation",
-    tagline: "Add a short tagline here",
+    tagline: "Interactive physics simulation",
     description: "One of my favorite and most interactable weekend projects. Saw someone who built something similar on X and i knew i wanted my own. within about half an our i had fully planned out how i wanted the system to work, give it to claude code and after some debugging it was fully working",
     skills: ["Computer Vision", "AprilTag Detection", "Homography Calibration", "Projective Geometry"],
     model: null,
@@ -60,7 +60,7 @@ const projects = [
   {
     id: "sand-plotter",
     name: "Sand Plotter",
-    tagline: "Kinetic sand art table driven by stepper motors",
+    tagline: "Kinetic sand art table",
     description: "I was inspired to build this after seeing it in a science museum, and it was surprisingly simple. It was the first large project I made, and all it took was some extruded aluminum, stepper motors, electronics, magnets, sand, and a trip to Home Depot.",
     skills: ["Stepper Motors", "Motion Control", "CAD", "Embedded Systems"],
     model: null,
@@ -216,7 +216,7 @@ const projects = [
   {
     id: "pantilt",
     name: "Pan-Tilt Mount",
-    tagline: "Two-axis servo-driven camera and sensor mount",
+    tagline: "Two-axis servo-driven camera and sensor platform",
     description: "When I started this project, I assumed it would take a week to finish. However, we kept adding features and improving it, and I ended up designing a custom PCB for it. It uses two stepper motors and OpenCV, and it also runs a small deep-learning ReID model to identify people and associate faces with names. It calculates a person's acceleration, subtracts the system's own movement, and predicts where the person will be.",
     skills: ["Stepper Control", "CAD", "3D Printing", "Computer Vision", "PID Tuning", "PCB Design"],
     model: null,
@@ -230,8 +230,8 @@ const projects = [
   {
     id: "parametric-speaker",
     name: "Parametric Speaker",
-    tagline: "Ultrasonic directional audio transducer array",
-    description: "Add your description here — what problem did this solve, how did you design and build it, what were the interesting challenges?",
+    tagline: "Ultrasonic \"sound laser\"",
+    description: "I had heard of parametric speakers before and how people compared them to a sound laser, and that the effect could only really be appreciated in person. After a couple of late nights, I had a working perf-boarded version complete. There are still plenty of improvements I want to make to the prototype, but pointing it at a flat surface and hearing that surface \"emit\" sound is truly something you can only appreciate in person.",
     skills: ["Ultrasonic Transducers", "AM Modulation", "STM 32", "PCB Design"],
     model: null,
     images: [],
