@@ -3,7 +3,7 @@
 // ============================================================
 //
 //  HOW TO ADD PHOTOS:
-//    - Put new project media in "staging/<project-folder>/"
+//    - Put new project media in a new folder at repo root: "<project-folder>/"
 //    - Run: powershell -ExecutionPolicy Bypass -File scripts/sync-assets.ps1
 //    - Keep paths here relative to project folder (spaces become %20)
 //      e.g.  images: ["6dof%20arm/photo1.jpg", "6dof%20arm/photo2.jpg"]
@@ -221,7 +221,7 @@ const projects = [
     skills: ["Stepper Control", "CAD", "3D Printing", "Computer Vision", "PID Tuning", "PCB Design"],
     model: null,
     videos: [
-      "PanTilt/pantilt-demo.mp4"
+      "pantilt/pantilt-demo.mp4"
     ],
     images: [],
     timeline: [],

@@ -7,3 +7,13 @@ staging/
 
 # Local agent/project context file (never committed)
 CONTEXT.md
+
+# Ignore all root-level folders by default (local project drops),
+# then allow only folders that belong in the published site.
+/*/
+!/assets/
+!/css/
+!/js/
+!/lib/
+!/public/
+!/scripts/

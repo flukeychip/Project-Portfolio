@@ -1,7 +1,20 @@
 param(
-  [string]$SourceRoot = "staging",
+  [string]$SourceRoot = ".",
   [string]$TargetRoot = "assets",
-  [string[]]$Projects = @()
+  [string[]]$Projects = @(),
+  [string[]]$ExcludeFolders = @(
+    ".git",
+    ".github",
+    ".claude",
+    "assets",
+    "css",
+    "js",
+    "lib",
+    "public",
+    "scripts",
+    "staging",
+    "node_modules"
+  )
 )
 
 Set-StrictMode -Version Latest
@@ -16,13 +29,16 @@ $sourcePath = Resolve-RootPath -PathValue $SourceRoot
 $targetPath = Resolve-RootPath -PathValue $TargetRoot
 
 if (-not (Test-Path -LiteralPath $sourcePath -PathType Container)) {
-  Write-Host "No staging folder found at '$SourceRoot'. Nothing to sync."
+  Write-Host "Source folder '$SourceRoot' not found. Nothing to sync."
   exit 0
 }
 
 if (-not (Test-Path -LiteralPath $targetPath -PathType Container)) {
   New-Item -ItemType Directory -Path $targetPath | Out-Null
 }
+
+$excluded = @{}
+foreach ($name in $ExcludeFolders) { $excluded[$name.ToLowerInvariant()] = $true }
 
 $foldersToSync = @()
 if ($Projects.Count -gt 0) {
@@ -35,7 +51,9 @@ if ($Projects.Count -gt 0) {
     }
   }
 } else {
-  $foldersToSync = Get-ChildItem -LiteralPath $sourcePath -Directory
+  $foldersToSync = Get-ChildItem -LiteralPath $sourcePath -Directory | Where-Object {
+    -not $excluded.ContainsKey($_.Name.ToLowerInvariant())
+  }
 }
 
 if ($foldersToSync.Count -eq 0) {
