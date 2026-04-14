@@ -29,7 +29,7 @@ const projects = [
     id: "6dof-arm",
     name: "6-DOF Robot Arm",
     tagline: "Six-degree-of-freedom articulated robot arm",
-    description: "I have always wanted to build one of these and was inspired by the Universal Robots UR16e we have on campus. I am still in the process of designing everything, but I am using 20:1 cycloidal drives on the base, shoulder, and elbow, with 8:1 cycloidal drives on wrist 1, wrist 2, and wrist 3. Additionally, I am working on a PCB that mounts to the back of each motor and contains a dedicated motor driver, IMU, microcontroller, and power regulation. I noticed that many other DIY 6-DOF arms have large wire bundles running to each joint, so this is my attempt to minimize that. After the design is complete, I will start training it in Isaac Sim to clean my desk.",
+    description: "Inspired by the Universal Robots UR16e on campus, I am building a six-degree-of-freedom articulated robot arm. My main goal is to design an efficient robotic arm, using 20:1 cycloidal drives for the base, shoulder, and elbow, and 8:1 cycloidal drives for the wrists. I am developing a PCB for each motor, integrating the driver, IMU, microcontroller, and power regulation to reduce wiring bundles to each joint. Once the design is finalized, I plan to train the arm in Isaac Sim to clean my desk.",
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
     model: null,
     images: [
@@ -42,7 +42,7 @@ const projects = [
     id: "ar-physics-simulation",
     name: "AR Physics Simulation",
     tagline: "Interactive physics simulation",
-    description: "One of my favorite and most interactable weekend projects. Saw someone who built something similar on X and i knew i wanted my own. within about half an our i had fully planned out how i wanted the system to work, give it to claude code and after some debugging it was fully working",
+    description: "One of my favorite and most interactive weekend projects. I saw someone who built something similar on X, and I knew I wanted my own. Within about half an hour, I had fully planned out how I wanted the system to work, gave it to Claude code, and after some debugging, it was fully working",
     skills: ["Computer Vision", "AprilTag Detection", "Homography Calibration", "Projective Geometry"],
     model: null,
     videos: [
@@ -61,7 +61,7 @@ const projects = [
     id: "sand-plotter",
     name: "Sand Plotter",
     tagline: "Kinetic sand art table",
-    description: "I was inspired to build this after seeing it in a science museum, and it was surprisingly simple. It was the first large project I made, and all it took was some extruded aluminum, stepper motors, electronics, magnets, sand, and a trip to Home Depot.",
+    description: "I was inspired to build this after seeing it at a science museum and being impressed by how satisfying it was to draw patterns and watch all the parts move. It was the first large project I made, and all it took was some extruded aluminum, stepper motors, electronics, magnets, sand, and a trip to Home Depot.",
     skills: ["Stepper Motors", "Motion Control", "CAD", "Embedded Systems"],
     model: null,
     images: [
@@ -74,7 +74,7 @@ const projects = [
     id: "laser-engraver",
     name: "2-Axis Laser Engraver",
     tagline: "Custom-built CNC laser engraver",
-    description: "I had a 5W laser diode from my modified Ender 3 and wanted to repurpose it into a larger standalone engraver. The frame design was inspired by my earlier Sand Plotter project, but this version improved the areas where that build struggled: rigidity, motion smoothness, and overall reliability. After a few hours of CAD and 3D printing, I built a machine with a 0.25 m² working area. If I revisit this project, I would add a second stepper motor on the Y-axis for even smoother and more stable motion.",
+    description: "I took the 5W laser diode from my modified Ender 3 and repurposed it into a larger standalone engraver. My earlier Sand Plotter project inspired the frame design, but I improved areas where that build struggled: rigidity, motion smoothness, and overall reliability. After spending a few hours on CAD and 3D printing, I built a machine with a working area of 0.25 m². If I revisit this project, I will add a second stepper motor to the Y-axis for even smoother, more stable motion.",
     skills: ["GRBL", "Stepper Motors", "CAD", "Laser Control", "Motion Control", "3D Printing"],
     model: "2%20axis%20laser%20engraver/laser-engraver.glb",
     videos: [
@@ -91,9 +91,9 @@ const projects = [
   },
   {
     id: "buck-5v",
-    name: "5V Buck Converter",
+    name: "Low Cost Switching Power Supply",
     tagline: "Custom switching power supply PCB",
-    description: "this was my first time soldering smd components and i knew that this project was just a testbench. it taught me the process, and allowed me to incorperate it into other designs.",
+    description: "This was my first time soldering SMD components, and I knew that this project was just a test bench. It taught me the process and allowed me to incorporate it into other designs.",
     skills: ["PCB Design", "Autodesk Eagle", "Power Electronics", "Switching Regulators"],
     model: null,
     images: [
@@ -106,7 +106,7 @@ const projects = [
     id: "buck-12a",
     name: "12A Buck Converter",
     tagline: "High-current switching power supply PCB",
-    description: "This is a continuation of the 5V buck converter. It still outputs 5V, but at the highest current I have worked with so far. This project is still a testbench for a future design.",
+    description: "This is a continuation of the 5V buck converter. It still outputs 5V, but at the highest current I have worked with so far. This project is still a test bench for a future design.",
     skills: ["PCB Design", "Autodesk Eagle", "Power Electronics", "Switching Regulators"],
     model: null,
     images: [
@@ -133,9 +133,9 @@ const projects = [
   },
   {
     id: "led-controller",
-    name: "LED Controller",
+    name: "WiFi Smart LED Controller",
     tagline: "Multi-channel PWM LED control system",
-    description: "I have been working on this project for a while and hope to turn it into a product. In the next iteration, I plan to incorporate lessons from my last two projects to address the shortcomings of the current version. The new design will use an SMD-soldered ESP32 instead of a dev board, and it will be powered through USB-C capable of delivering up to 60W.",
+    description: "I have been working on this project for a while and hope to turn it into a product. In the next iteration, I plan to incorporate lessons from my last two projects to address the shortcomings of the current version. The new design will use an SMD-soldered ESP32 instead of a dev board, and it will be powered through USB-C, capable of delivering up to 60W.",
     skills: ["PWM", "PCB Design", "ESP 32", "LED Drivers"],
     model: null,
     images: [
@@ -150,9 +150,9 @@ const projects = [
   },
   {
     id: "drone",
-    name: "Drone",
+    name: "3D Printed Drone With Bistable Arms",
     tagline: "Custom-built folding arm quadcopter",
-    description: "Back during COVID, I was bored out of my mind and looking for a project to start. Coincidentally, my school had just given me a bunch of drone parts because they did not know what to do with them. I spent a few months refining the design to be as lightweight and inexpensive as possible. It uses an ultrasonic sensor to estimate height from the ground, and its bistable locking arms are held in position using pen springs (putting a few together is surprisingly effective). Unfortunately, I had no idea what I was doing when it came to PID tuning, and the drone would appear to be working fine, then oscillate wildly. This may also have been due to PETG being relatively flexible. If I revisit this project, I would redesign it from the ground up using everything I have learned since then.",
+    description: "This project sprang from boredom during COVID, when my school was closed. Coincidentally, my school had just given me drone parts because they did not know what to do with them. I spent a few months refining the design to be as lightweight and inexpensive as possible. It uses an ultrasonic sensor to estimate height from the ground, and its bistable locking arms are held in position using pen springs (putting a few together is surprisingly effective). Unfortunately, I had no idea what I was doing with PID tuning, and the drone would seem to be working fine, then oscillate wildly. This may also have been due to PETG's relative flexibility. If I revisit this project, I would redesign it from the ground up using everything I have learned since then.",
     skills: ["Flight Controller", "ESC", "CAD", "3D Printing", "PID Tuning"],
     model: null,
     images: [
@@ -166,7 +166,7 @@ const projects = [
     id: "heartbeat-detector",
     name: "Analog Heartbeat Detector",
     tagline: "Biomedical analog circuit for pulse detection",
-    description: "This is the only school-required project I have on here because I thought it was so cool. We were given a bucket of ICs and passive components and told we needed to build a circuit that would flash an LED every time your heart beat. Other than that, we were given a few constraints but not told how to actually build it. I thought the freedom to choose how it was built and what to use was really cool, and a good preview of what industry would actually be like.",
+    description: "This is the only school-required project I have on here because I thought it was so cool. We were given a bucket of ICs and passive components and told we needed to build a circuit that would flash an LED every time our heart beat. Other than that, we were given a few constraints but not told how to actually build it. I thought the freedom to choose how it was built and what to use was really cool, and a good preview of what the industry would actually be like.",
     skills: ["Op-Amps", "Analog Filters", "PCB Design", "Signal Conditioning"],
     model: null,
     images: [
@@ -186,7 +186,7 @@ const projects = [
     id: "drink-dispenser",
     name: "Drink Dispenser",
     tagline: "Automated drink dispensing system",
-    description: "The inspiration for this came from YouTube, where I saw someone build an Alexa-controlled automated drink maker. I thought I could build a better one, so I spent about a month designing it. My version features a custom PCB (I did not know what a ground plane was at the time) and a load cell in the base, giving it closed-loop feedback on how many milliliters have been poured. It is also designed to be quickly and easily 3D printed, then assembled.",
+    description: "Inspired by a YouTube video of an Alexa-controlled drink maker, I decided to design my own improved version over the course of a month. My system uses a custom PCB and a load cell in the base for closed-loop feedback. It's also designed for easy 3D printing and assembly.",
     skills: ["Embedded Systems", "Motor Control", "CAD", "3D Printing"],
     model: null,
     images: [
@@ -200,7 +200,7 @@ const projects = [
     id: "necklace-organizer",
     name: "Necklace Organizer",
     tagline: "Flexible, easy-to-use jewelry organizer",
-    description: "This started as a request from my little sister to organize all her necklaces while traveling. After massively over-engineering the first version—a print-in-place ratcheting mechanism with a release button—I refined it into a design that does the same job with shorter print times and comparable ease of use.",
+    description: "This started as my little sister's request to organize all her necklaces while traveling. Apparently, one of the biggest issues travelers face is that their necklaces get tangled even when kept in a pouch. After massively over-engineering the first version—a print-in-place ratcheting mechanism with a release button—I refined it into a design that does the same job with shorter print times and comparable ease of use.",
     skills: ["CAD", "Fusion 360", "3D Printing", "Parametric Design"],
     model: null,
     images: [
@@ -231,7 +231,7 @@ const projects = [
     id: "parametric-speaker",
     name: "Parametric Speaker",
     tagline: "Ultrasonic \"sound laser\"",
-    description: "I had heard of parametric speakers before and how people compared them to a sound laser, and that the effect could only really be appreciated in person. After a couple of late nights, I had a working perf-boarded version complete. There are still plenty of improvements I want to make to the prototype, but pointing it at a flat surface and hearing that surface \"emit\" sound is truly something you can only appreciate in person.",
+    description: "I had heard of parametric speakers before—devices that use arrays of ultrasonic transducers to create highly directional audio beams, earning them the nickname \"sound laser.\" The effect is difficult to convey unless experienced in person. After a couple of late nights, I completed a working version on a perfboard that amplitude modulates an audio signal onto an ultrasonic carrier. While there are improvements I plan to make to the prototype, aiming the speaker at a flat surface illustrates how the modulated sound demodulates in air, causing the surface itself to \"emit\" sound—a phenomenon best appreciated live.",
     skills: ["Ultrasonic Transducers", "AM Modulation", "STM 32", "PCB Design"],
     model: null,
     images: [],
