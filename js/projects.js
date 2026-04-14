@@ -125,6 +125,7 @@ const projects = [
     skills: ["ESP32", "PCB Design", "Autodesk Eagle", "Embedded Systems"],
     model: null,
     images: [
+      "ESP32%20devboard%20testbench/Hot%20plare.jpg",
       "ESP32%20devboard%20testbench/Screenshot%202026-01-07%20174032.png",
       "ESP32%20devboard%20testbench/Screenshot%202026-04-01%20171213.png"
     ],
@@ -188,7 +189,7 @@ const projects = [
     tagline: "Automated drink dispensing system",
     description: "Inspired by a YouTube video of an Alexa-controlled drink maker, I decided to design my own improved version over the course of a month. My system uses a custom PCB and a load cell in the base for closed-loop feedback. It's also designed for easy 3D printing and assembly.",
     skills: ["Embedded Systems", "Motor Control", "CAD", "3D Printing"],
-    model: "assets/Drink dispenser/drink-dispenser.glb",
+    model: "Drink%20dispenser/drink-dispenser.glb",
     images: [
       "Drink%20dispenser/PCB%20Top.jpg",
       "Drink%20dispenser/PCB%20Bottom.jpg"
@@ -217,11 +218,15 @@ const projects = [
     id: "pantilt",
     name: "Pan-Tilt Mount",
     tagline: "Two-axis servo-driven camera and sensor platform",
-    description: "When I started this project, I assumed it would take a week to finish. However, we kept adding features and improving it, and I ended up designing a custom PCB for it. It uses two stepper motors and OpenCV, and it also runs a small deep-learning ReID model to identify people and associate faces with names. It calculates a person's acceleration, subtracts the system's own movement, and predicts where the person will be.",
+    description: "This project started when someone began stealing furniture from the front of our house. A friend and I were given a $100 budget to build something that would stop it. We came up with the idea of attaching a gel blaster (basically a jello launcher) to a pan-tilt motion system. It took a lot of refinement to get where it is now, but it is finally complete. It features a custom PCB, a wide-field-of-view camera and a narrow-field-of-view camera, as well as night vision. A powerful computer runs a program that uses OpenCV to detect people and ReID checks to determine whether they are in the system. If they are not, it calculates how far away they are and then computes a ballistic lead with gravity compensation. There are plenty more features, and it serves as a great deterrent.",
     skills: ["Stepper Control", "CAD", "3D Printing", "Computer Vision", "PID Tuning", "PCB Design"],
     model: null,
     videos: [
-      "pantilt/pantilt-demo.mp4"
+      "pantilt/pantilt-demo.mp4",
+      "pantilt/testing-software.mp4",
+      "pantilt/img-2555.mp4",
+      "pantilt/ryan-running.mp4",
+      "pantilt/sam-moving-no-end-effector.mp4"
     ],
     images: [],
     timeline: [],
@@ -234,6 +239,9 @@ const projects = [
     description: "I had heard of parametric speakers before—devices that use arrays of ultrasonic transducers to create highly directional audio beams, earning them the nickname \"sound laser.\" The effect is difficult to convey unless experienced in person. After a couple of late nights, I completed a working version on a perfboard that amplitude modulates an audio signal onto an ultrasonic carrier. While there are improvements I plan to make to the prototype, aiming the speaker at a flat surface illustrates how the modulated sound demodulates in air, causing the surface itself to \"emit\" sound—a phenomenon best appreciated live.",
     skills: ["Ultrasonic Transducers", "AM Modulation", "STM 32", "PCB Design"],
     model: null,
+    videos: [
+      "Parametric%20speaker/lab-video.mp4"
+    ],
     images: [],
     timeline: [],
     files: []

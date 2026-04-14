@@ -458,8 +458,11 @@
       if (firstMedia.type === '3d') {
         galleryHTML += '<div class="gallery-item gallery-item-3d" id="3d-' + p.id + '"></div>';
       } else if (firstMedia.type === 'video') {
+        var allowSoundOnClick = p.id === 'parametric-speaker';
+        var soundDataAttr = allowSoundOnClick ? ' data-allow-sound="true"' : '';
+        var soundTitleAttr = allowSoundOnClick ? ' title="Click to enable sound"' : '';
         galleryHTML += '<div class="gallery-item gallery-item-video">' +
-          '<video src="' + firstMedia.src + '" autoplay loop muted playsinline></video>' +
+          '<video src="' + firstMedia.src + '" autoplay loop muted playsinline' + soundDataAttr + soundTitleAttr + '></video>' +
         '</div>';
       } else if (firstMedia.type === 'image') {
         galleryHTML += '<div class="gallery-item"><img src="' + firstMedia.src + '" alt="' + p.name + '"></div>';
@@ -607,6 +610,10 @@
       vid.loop = true;
       vid.muted = true;
       vid.setAttribute('playsinline', '');
+      if (projectId === 'parametric-speaker') {
+        vid.setAttribute('data-allow-sound', 'true');
+        vid.title = 'Click to enable sound';
+      }
       var item = document.createElement('div');
       item.className = 'gallery-item gallery-item-video';
       item.appendChild(vid);
@@ -628,6 +635,14 @@
     if (counter) {
       counter.textContent = (nextIndex + 1) + ' / ' + mediaArray.length;
     }
+  });
+
+  // Parametric speaker videos stay muted until the user clicks.
+  document.addEventListener('click', function (e) {
+    var vid = e.target.closest('video[data-allow-sound="true"]');
+    if (!vid) return;
+    vid.muted = false;
+    vid.play().catch(function () {});
   });
 
 })();
