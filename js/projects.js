@@ -139,6 +139,11 @@ const projects = [
     description: "I have been working on this project for a while and hope to turn it into a product. In the next iteration, I plan to incorporate lessons from my last two projects to address the shortcomings of the current version. The new design will use an SMD-soldered ESP32 instead of a dev board, and it will be powered through USB-C, capable of delivering up to 60W.",
     skills: ["PWM", "PCB Design", "ESP 32", "LED Drivers"],
     model: null,
+    videos: [
+      "LED%20controller/wled-maybe-audio.mp4",
+      "LED%20controller/wled-no-audio.mp4",
+      "LED%20controller/v2-short-timeline.mp4"
+    ],
     images: [
       "LED%20controller/V2%20Holding.jpg"
     ],
