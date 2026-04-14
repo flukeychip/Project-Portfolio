@@ -615,7 +615,7 @@ nav {
 /* Video */
 .gallery-item-video {
   width: 100%;
-  height: 400px;
+  height: clamp(460px, 62vh, 720px);
   background: var(--bg-color);
   border-radius: 6px;
   overflow: hidden;
@@ -629,7 +629,7 @@ nav {
 
 .gallery-item-3d {
   width: 100%;
-  height: 400px;
+  height: clamp(460px, 62vh, 720px);
 }
 
 .media-nav {

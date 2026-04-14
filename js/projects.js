@@ -141,8 +141,7 @@ const projects = [
     model: null,
     videos: [
       "LED%20controller/wled-maybe-audio.mp4",
-      "LED%20controller/wled-no-audio.mp4",
-      "LED%20controller/v2-short-timeline.mp4"
+      "LED%20controller/wled-no-audio.mp4"
     ],
     images: [
       "LED%20controller/V2%20Holding.jpg"
@@ -150,7 +149,8 @@ const projects = [
     timeline: [
       { src: "LED%20controller/V1%20PCB%20top%20Cad.jpg",       label: "V1 PCB Design" },
       { src: "LED%20controller/V1%20Assembled.jpg",             label: "V1 Assembled" },
-      { src: "LED%20controller/V2%20Partily%20assembled.jpg",   label: "V2 In Progress" }
+      { src: "LED%20controller/V2%20Partily%20assembled.jpg",   label: "V2 In Progress" },
+      { src: "LED%20controller/v2-short-timeline.mp4",          label: "V2 Short" }
     ],
     files: []
   },
@@ -227,10 +227,9 @@ const projects = [
     skills: ["Stepper Control", "CAD", "3D Printing", "Computer Vision", "PID Tuning", "PCB Design"],
     model: null,
     videos: [
+      "pantilt/ryan-running.mp4",
       "pantilt/pantilt-demo.mp4",
       "pantilt/testing-software.mp4",
-      "pantilt/img-2555.mp4",
-      "pantilt/ryan-running.mp4",
       "pantilt/sam-moving-no-end-effector.mp4"
     ],
     images: [],
@@ -241,7 +240,7 @@ const projects = [
     id: "parametric-speaker",
     name: "Parametric Speaker",
     tagline: "Ultrasonic \"sound laser\"",
-    description: "I had heard of parametric speakers before—devices that use arrays of ultrasonic transducers to create highly directional audio beams, earning them the nickname \"sound laser.\" The effect is difficult to convey unless experienced in person. After a couple of late nights, I completed a working version on a perfboard that amplitude modulates an audio signal onto an ultrasonic carrier. While there are improvements I plan to make to the prototype, aiming the speaker at a flat surface illustrates how the modulated sound demodulates in air, causing the surface itself to \"emit\" sound—a phenomenon best appreciated live.",
+    description: "I had seen a parametric speaker in a YouTube video and really wanted to hear what it sounded like in person. After doing some research, I breadboarded one using a single piezo, a 555 timer, and a motor driver (all modulation was done with analog components). I later upgraded it to use an array of seven piezos and an STM32 to receive a positively biased input signal, generate a 40 kHz wave, and combine them. This approach produced much cleaner and louder audio. However, it is best appreciated in person, and my phone's microphone does not do it justice. (Click to unmute)",
     skills: ["Ultrasonic Transducers", "AM Modulation", "STM 32", "PCB Design"],
     model: null,
     videos: [

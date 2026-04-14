@@ -635,7 +635,30 @@
     if (counter) {
       counter.textContent = (nextIndex + 1) + ' / ' + mediaArray.length;
     }
+
+    syncSoundEnabledVideos();
   });
+
+  var soundVideoObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var vid = entry.target;
+      if (!entry.isIntersecting || entry.intersectionRatio < 0.6) {
+        vid.muted = true;
+        vid.pause();
+      } else {
+        vid.play().catch(function () {});
+      }
+    });
+  }, { threshold: [0, 0.6, 1] });
+
+  function syncSoundEnabledVideos() {
+    var vids = document.querySelectorAll('video[data-allow-sound="true"]');
+    vids.forEach(function (vid) {
+      if (vid.dataset.soundObserved === 'true') return;
+      vid.dataset.soundObserved = 'true';
+      soundVideoObserver.observe(vid);
+    });
+  }
 
   // Parametric speaker videos stay muted until the user clicks.
   document.addEventListener('click', function (e) {
@@ -644,5 +667,7 @@
     vid.muted = false;
     vid.play().catch(function () {});
   });
+
+  syncSoundEnabledVideos();
 
 })();
