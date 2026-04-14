@@ -29,7 +29,7 @@ const projects = [
     id: "6dof-arm",
     name: "6-DOF Robot Arm",
     tagline: "Six-degree-of-freedom articulated robot arm",
-    description: "Inspired by the Universal Robots UR16e on campus, I am building a six-degree-of-freedom articulated robot arm. My main goal is to design an efficient robotic arm, using 20:1 cycloidal drives for the base, shoulder, and elbow, and 8:1 cycloidal drives for the wrists. I am developing a PCB for each motor, integrating the driver, IMU, microcontroller, and power regulation to reduce wiring bundles to each joint. Once the design is finalized, I plan to train the arm in Isaac Sim to clean my desk.",
+    description: "Inspired by the Universal Robots UR16e on campus, I am building a six-degree-of-freedom robot arm. My main goal is to design an efficient robotic arm, using 20:1 cycloidal drives for the base, shoulder, and elbow, and 8:1 cycloidal drives for the wrists. I am developing a PCB for each motor. I plan to integrate the driver, IMU, microcontroller, and power regulation to the reduce wiring on each joint. Once the design is finalized, I plan to train the arm in Isaac Sim to clean my desk.",
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
     model: null,
     images: [
@@ -42,7 +42,7 @@ const projects = [
     id: "ar-physics-simulation",
     name: "AR Physics Simulation",
     tagline: "Interactive physics simulation",
-    description: "One of my favorite and most interactive weekend projects. I saw someone who built something similar on X, and I knew I wanted my own. Within about half an hour, I had fully planned out how I wanted the system to work, gave it to Claude code, and after some debugging, it was fully working",
+    description: "One of my favorite and most interactive weekend projects. I saw someone who built something similar on X, and I knew I wanted my own. Within about half an hour, I had fully planned out how I wanted the system to work, gave it to Claude code, and after some debugging, it was fully working. It is extremely satisfying to place a Post-it note on the wall and watch projected ping pong balls appear from it and interact with other Post-it notes on the wall.",
     skills: ["Computer Vision", "AprilTag Detection", "Homography Calibration", "Projective Geometry"],
     model: null,
     videos: [
@@ -188,7 +188,7 @@ const projects = [
     tagline: "Automated drink dispensing system",
     description: "Inspired by a YouTube video of an Alexa-controlled drink maker, I decided to design my own improved version over the course of a month. My system uses a custom PCB and a load cell in the base for closed-loop feedback. It's also designed for easy 3D printing and assembly.",
     skills: ["Embedded Systems", "Motor Control", "CAD", "3D Printing"],
-    model: null,
+    model: "assets/Drink dispenser/drink-dispenser.glb",
     images: [
       "Drink%20dispenser/PCB%20Top.jpg",
       "Drink%20dispenser/PCB%20Bottom.jpg"
