@@ -162,6 +162,7 @@ const projects = [
     skills: ["Flight Controller", "ESC", "CAD", "3D Printing", "PID Tuning"],
     model: null,
     images: [
+      "Foldable%20Quadracopter/Looping%20gif.gif",
       "Foldable%20Quadracopter/Arms%20Extended.jpg",
       "Foldable%20Quadracopter/Arms%20Folded.jpg"
     ],
