@@ -5,6 +5,12 @@
   const projectsContainer = document.getElementById('project-details');
   let carouselScrollLocked = false;
 
+  // Safari applies CSS scroll-behavior: smooth to programmatic scrollTo() calls,
+  // which causes the scroll-lock to animate instead of snap → first project detail glitches.
+  // Other browsers (Chrome, Firefox) handle this correctly without overriding.
+  var isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+  var lockScrollBehavior = isSafari ? 'instant' : 'auto';
+
   function toAssetPath(pathValue) {
     if (!pathValue || typeof pathValue !== 'string') return pathValue;
     if (
@@ -35,6 +41,49 @@
   }
 
   const normalizedProjects = projects.map(normalizeProjectPaths);
+
+  // Graceful media fallback — if a video/image 404s or fails to decode, swap in
+  // a clean placeholder instead of a black box or broken-image icon. This keeps
+  // the site looking intentional while assets are being swapped/converted.
+  function replaceWithPlaceholder(el, label) {
+    if (!el || !el.parentNode) return;
+    var ph = document.createElement('div');
+    ph.className = 'media-unavailable';
+    ph.textContent = label || 'Media unavailable';
+    el.parentNode.replaceChild(ph, el);
+  }
+
+  function hasWebGL() {
+    try {
+      var c = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch (e) { return false; }
+  }
+
+  function show3DFallback(container, message) {
+    if (!container) return;
+    container.innerHTML = '';
+    container.classList.add('is-fallback');
+    var ph = document.createElement('div');
+    ph.className = 'media-unavailable';
+    ph.textContent = message;
+    container.appendChild(ph);
+  }
+
+  function attachMediaFallback(el, label) {
+    if (!el) return;
+    el.addEventListener('error', function () {
+      replaceWithPlaceholder(el, label);
+    }, { once: true });
+    if (el.tagName === 'VIDEO') {
+      // <video> also needs to watch for empty/invalid sources that never fire 'error'
+      el.addEventListener('stalled', function () {
+        if (el.networkState === 3 /* NETWORK_NO_SOURCE */) {
+          replaceWithPlaceholder(el, label);
+        }
+      });
+    }
+  }
 
   // ── 3D Script Loader ───────────────────────────────────────
   function loadScriptsSequential(urls, callback) {
@@ -82,21 +131,34 @@
     }
 
     init() {
-      this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0xFAFAFC);
+      if (!hasWebGL()) {
+        show3DFallback(this.container, '3D model could load but your system is blocking it');
+        this.container = null;
+        return false;
+      }
 
-      // Orthographic camera — frustum updated in resize(); placeholder until first layout
-      const frustumSize = 6;
-      this.camera = new THREE.OrthographicCamera(
-        -frustumSize / 2, frustumSize / 2,
-        frustumSize / 2, -frustumSize / 2,
-        0.1, 1000
-      );
-      this.camera.position.z = 10;
+      try {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0xFAFAFC);
 
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
-      this.container.appendChild(this.renderer.domElement);
-      this.resize();
+        // Orthographic camera — frustum updated in resize(); placeholder until first layout
+        const frustumSize = 6;
+        this.camera = new THREE.OrthographicCamera(
+          -frustumSize / 2, frustumSize / 2,
+          frustumSize / 2, -frustumSize / 2,
+          0.1, 1000
+        );
+        this.camera.position.z = 10;
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.container.appendChild(this.renderer.domElement);
+        this.resize();
+      } catch (e) {
+        console.error('3D init failed:', e);
+        show3DFallback(this.container, '3D model could load but your system is blocking it');
+        this.container = null;
+        return false;
+      }
 
       // Lighting
       const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -136,9 +198,11 @@
         this.resize();
         if (this.visible && this.model) this.renderer.render(this.scene, this.camera);
       }.bind(this));
+      return true;
     }
 
     loadModel(modelPath) {
+      if (!this.renderer || !this.container) return; // init failed → placeholder already shown
       const loader = new THREE.GLTFLoader();
       loader.load(
         modelPath,
@@ -168,7 +232,12 @@
           else if (this.visible) this.renderer.render(this.scene, this.camera);
         },
         undefined,
-        (error) => console.error('Model load error:', error)
+        (error) => {
+          console.error('Model load error:', error);
+          show3DFallback(this.container, '3D model failed to load');
+          if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
+          this.container = null;
+        }
       );
     }
 
@@ -236,6 +305,8 @@
         '<h3>' + p.name + '</h3>' +
         '<p>' + p.tagline + '</p>' +
       '</div>';
+
+    attachMediaFallback(card.querySelector('img.carousel-img, video.carousel-img'), 'Preview unavailable');
 
     card.addEventListener('click', function (e) {
       e.preventDefault();
@@ -372,7 +443,7 @@
 
     if (inCarouselMode) {
       blocking = true;
-      window.scrollTo(0, scrollY2);
+      window.scrollTo({ top: scrollY2, left: 0, behavior: lockScrollBehavior });
       blocking = false;
       applyTransforms(scrollY2);
       return;
@@ -384,7 +455,7 @@
     if (!carouselDone && !inCarouselMode && Math.abs(carouselCenterInViewport() - vp / 2) < 20) {
       inCarouselMode = true;
       blocking = true;
-      window.scrollTo(0, scrollY2);
+      window.scrollTo({ top: scrollY2, left: 0, behavior: lockScrollBehavior });
       blocking = false;
       applyTransforms(scrollY2);
     }
@@ -524,6 +595,13 @@
 
     projectsContainer.appendChild(section);
 
+    // Hook error fallbacks on any rendered media (first gallery item + timeline images)
+    var initialMediaEl = section.querySelector('.media-viewer video, .media-viewer img');
+    attachMediaFallback(initialMediaEl, 'Media unavailable');
+    section.querySelectorAll('.timeline-item img').forEach(function (img) {
+      attachMediaFallback(img, 'Image unavailable');
+    });
+
     // Store media array on the section for carousel navigation
     section.mediaArray = mediaArray;
     section.currentMediaIndex = 0;
@@ -618,6 +696,7 @@
       item.className = 'gallery-item gallery-item-video';
       item.appendChild(vid);
       viewer.appendChild(item);
+      attachMediaFallback(vid, 'Media unavailable');
     } else if (nextMedia.type === 'image') {
       var img = document.createElement('img');
       img.src = nextMedia.src;
@@ -626,6 +705,7 @@
       item.className = 'gallery-item';
       item.appendChild(img);
       viewer.appendChild(item);
+      attachMediaFallback(img, 'Image unavailable');
     }
 
     section.currentMediaIndex = nextIndex;

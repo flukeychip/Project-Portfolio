@@ -8,6 +8,7 @@
   --dark-block: #222222;
   --border: #EAEAEA;
   --font: Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --ease: 0.3s ease;
 }
 
@@ -630,6 +631,46 @@ nav {
 .gallery-item-3d {
   width: 100%;
   height: clamp(460px, 62vh, 720px);
+}
+
+/* Graceful fallback when a video/image fails to load (e.g. during asset swap). */
+.media-unavailable {
+  width: 100%;
+  height: clamp(200px, 40vh, 480px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f2;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.carousel-img + .media-unavailable,
+.carousel-card .media-unavailable {
+  height: 250px;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+}
+
+.timeline-item .media-unavailable {
+  height: 110px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+}
+
+.gallery-item-3d.is-fallback {
+  display: flex;
+  align-items: stretch;
+}
+
+.gallery-item-3d.is-fallback .media-unavailable {
+  width: 100%;
+  height: 100%;
 }
 
 .media-nav {

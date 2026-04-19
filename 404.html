@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found — Alexander Arens</title>
+  <meta name="description" content="Page not found on Alexander Arens' engineering portfolio." />
+  <meta name="theme-color" content="#FAFAFC" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111111'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' dominant-baseline='middle' font-family='Helvetica,Arial,sans-serif' font-size='30' font-weight='800' fill='%2310B981'%3EA%3C/text%3E%3C/svg%3E" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      background: #FAFAFC;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    .wrap { max-width: 520px; text-align: center; }
+    .code {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 2.25rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
+    p { color: #444; margin-bottom: 2rem; font-size: 1.05rem; }
+    a.btn {
+      display: inline-block;
+      padding: 0.9rem 1.8rem;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.2s;
+    }
+    a.btn:hover { background: #10B981; transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="code">Error 404</div>
+    <h1>This page doesn't exist.</h1>
+    <p>The link may be outdated or mistyped. Head back to the portfolio to find what you were looking for.</p>
+    <a class="btn" id="home" href="/">Back to portfolio</a>
+  </main>
+  <script>
+    // Resolve the portfolio base URL whether the site is served from the
+    // domain root (user / custom domain) or a GitHub Pages project path
+    // like /Project-Portfolio/. Keeps the 404 link correct after any rename.
+    (function () {
+      var host = location.hostname;
+      var parts = location.pathname.split('/').filter(Boolean);
+      var base = (host.endsWith('github.io') && parts.length > 0) ? '/' + parts[0] + '/' : '/';
+      var el = document.getElementById('home');
+      if (el) el.href = base;
+    })();
+  </script>
+</body>
+</html>
