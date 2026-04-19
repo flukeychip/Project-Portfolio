@@ -27,7 +27,7 @@
 const projects = [
   {
     id: "6dof-arm",
-    name: "6-DOF Robot Arm",
+    name: "6-DOF Robot Arm (WIP)",
     tagline: "Six-degree-of-freedom articulated robot arm",
     description: "Inspired by the Universal Robots UR16e on campus, I am building a six-degree-of-freedom robot arm. My main goal is to design an efficient robotic arm, using 20:1 cycloidal drives for the base, shoulder, and elbow, and 8:1 cycloidal drives for the wrists. I am developing a PCB for each motor. I plan to integrate the driver, IMU, microcontroller, and power regulation to the reduce wiring on each joint. Once the design is finalized, I plan to train the arm in Isaac Sim to clean my desk.",
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
