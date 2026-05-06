@@ -132,8 +132,6 @@
 
     init() {
       if (!hasWebGL()) {
-        show3DFallback(this.container, '3D model could load but your system is blocking it');
-        this.container = null;
         return false;
       }
 
@@ -155,8 +153,6 @@
         this.resize();
       } catch (e) {
         console.error('3D init failed:', e);
-        show3DFallback(this.container, '3D model could load but your system is blocking it');
-        this.container = null;
         return false;
       }
 
@@ -201,8 +197,8 @@
       return true;
     }
 
-    loadModel(modelPath) {
-      if (!this.renderer || !this.container) return; // init failed → placeholder already shown
+    loadModel(modelPath, onLoadFailed) {
+      if (!this.renderer || !this.container) return; // init failed → caller downgrades
       const loader = new THREE.GLTFLoader();
       loader.load(
         modelPath,
@@ -234,9 +230,13 @@
         undefined,
         (error) => {
           console.error('Model load error:', error);
-          show3DFallback(this.container, '3D model failed to load');
           if (this.animationId) { cancelAnimationFrame(this.animationId); this.animationId = null; }
-          this.container = null;
+          if (typeof onLoadFailed === 'function') {
+            onLoadFailed();
+          } else {
+            show3DFallback(this.container, '3D model failed to load');
+            this.container = null;
+          }
         }
       );
     }
@@ -281,6 +281,124 @@
       this.model = null;
       this.mouseListener = null;
     }
+  }
+
+  // Gallery order in data: 3D (CAD) → videos → images. If 3D cannot run (no WebGL)
+  // or the .glb fails to load, remove that slot and show the next type automatically.
+  function updateGalleryChrome(section) {
+    var n = (section.mediaArray && section.mediaArray.length) || 0;
+    var counter = section.querySelector('.media-counter');
+    var prev = section.querySelector('.media-nav-prev');
+    var next = section.querySelector('.media-nav-next');
+    var showNav = n > 1;
+    if (counter) {
+      counter.style.display = showNav ? '' : 'none';
+      if (showNav) {
+        counter.textContent = (section.currentMediaIndex + 1) + ' / ' + n;
+      }
+    }
+    if (prev) prev.style.display = showNav ? '' : 'none';
+    if (next) next.style.display = showNav ? '' : 'none';
+  }
+
+  function renderMediaAtIndex(section, index) {
+    var projectId = section.id;
+    var viewer = section.querySelector('#viewer-' + projectId);
+    if (!viewer || !section.mediaArray || index < 0 || index >= section.mediaArray.length) return;
+
+    if (section.viewer3d) {
+      section.viewer3d.dispose();
+      section.viewer3d = null;
+    }
+
+    viewer.innerHTML = '';
+    viewer.classList.remove('media-fade-in');
+    void viewer.offsetWidth;
+    viewer.classList.add('media-fade-in');
+
+    var m = section.mediaArray[index];
+    var ptitle = section.querySelector('.project-title').textContent;
+
+    if (m.type === '3d') {
+      var container = document.createElement('div');
+      container.className = 'gallery-item gallery-item-3d';
+      container.id = '3d-' + projectId;
+      viewer.appendChild(container);
+
+      var viewer3d = new Viewer3D(container);
+      if (!viewer3d.init()) {
+        tryDowngradeFromFailed3D(section, viewer3d);
+        return;
+      }
+      section.viewer3d = viewer3d;
+      viewer3d.loadModel(m.src, function () {
+        tryDowngradeFromFailed3D(section, viewer3d);
+      });
+      return;
+    }
+
+    if (m.type === 'video') {
+      var vid = document.createElement('video');
+      vid.src = m.src;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.muted = true;
+      vid.setAttribute('playsinline', '');
+      if (projectId === 'parametric-speaker') {
+        vid.setAttribute('data-allow-sound', 'true');
+        vid.title = 'Click to enable sound';
+      }
+      var vwrap = document.createElement('div');
+      vwrap.className = 'gallery-item gallery-item-video';
+      vwrap.appendChild(vid);
+      viewer.appendChild(vwrap);
+      attachMediaFallback(vid, 'Media unavailable');
+      return;
+    }
+
+    if (m.type === 'image') {
+      var img = document.createElement('img');
+      img.src = m.src;
+      img.alt = ptitle;
+      var iwrap = document.createElement('div');
+      iwrap.className = 'gallery-item';
+      iwrap.appendChild(img);
+      viewer.appendChild(iwrap);
+      attachMediaFallback(img, 'Image unavailable');
+    }
+  }
+
+  function tryDowngradeFromFailed3D(section, viewer3d) {
+    var idx = section.currentMediaIndex;
+    if (!section.mediaArray || idx < 0 || idx >= section.mediaArray.length) return;
+    if (section.mediaArray[idx].type !== '3d') return;
+
+    section.mediaArray.splice(idx, 1);
+
+    if (viewer3d && typeof viewer3d.dispose === 'function') {
+      try { viewer3d.dispose(); } catch (e) {}
+    }
+    section.viewer3d = null;
+
+    var viewerEl = section.querySelector('#viewer-' + section.id);
+    if (!viewerEl) return;
+
+    viewerEl.innerHTML = '';
+    viewerEl.classList.remove('media-fade-in');
+
+    if (section.mediaArray.length === 0) {
+      viewerEl.innerHTML =
+        '<div class="gallery-item"><p style="color: #999; padding: 4rem 2rem; text-align: center;">No media</p></div>';
+      updateGalleryChrome(section);
+      return;
+    }
+
+    var newIdx = Math.min(idx, section.mediaArray.length - 1);
+    if (newIdx < 0) newIdx = 0;
+    section.currentMediaIndex = newIdx;
+    renderMediaAtIndex(section, newIdx);
+    syncSoundEnabledVideos();
+    updateGalleryChrome(section);
   }
 
   // ── Render Carousel ────────────────────────────────────────
@@ -497,7 +615,8 @@
       .map(function (s) { return '<div class="skill-badge">' + s + '</div>'; })
       .join('');
 
-    // Build media array with priority: 3D models → videos → images
+    // Gallery order: 3D (CAD) → videos → images. If WebGL is unavailable or the .glb
+    // fails to load, that 3D slot is removed and the viewer shows the next item.
     var mediaArray = [];
     if (p.model) {
       mediaArray.push({ type: '3d', src: p.model });
@@ -620,9 +739,14 @@
         pending3D.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
           var viewer = new Viewer3D(container);
-          viewer.init();
-          viewer.loadModel(item.src);
+          if (!viewer.init()) {
+            tryDowngradeFromFailed3D(item.section, viewer);
+            return;
+          }
           item.section.viewer3d = viewer;
+          viewer.loadModel(item.src, function () {
+            tryDowngradeFromFailed3D(item.section, viewer);
+          });
         });
       }
     );
@@ -657,66 +781,10 @@
       nextIndex = (currentIndex - 1 + mediaArray.length) % mediaArray.length;
     }
 
-    // Dispose old 3D viewer if exists
-    if (section.viewer3d) {
-      section.viewer3d.dispose();
-      section.viewer3d = null;
-    }
-
-    // Clear and render new media (with fade-in animation)
-    var viewer = section.querySelector('#viewer-' + projectId);
-    viewer.innerHTML = '';
-    viewer.classList.remove('media-fade-in');
-    void viewer.offsetWidth; // force reflow so animation re-triggers
-    viewer.classList.add('media-fade-in');
-
-    var nextMedia = mediaArray[nextIndex];
-    if (nextMedia.type === '3d') {
-      var container = document.createElement('div');
-      container.className = 'gallery-item gallery-item-3d';
-      container.id = '3d-' + projectId;
-      viewer.appendChild(container);
-
-      var viewer3d = new Viewer3D(container);
-      viewer3d.init();
-      viewer3d.loadModel(nextMedia.src);
-      section.viewer3d = viewer3d;
-    } else if (nextMedia.type === 'video') {
-      var vid = document.createElement('video');
-      vid.src = nextMedia.src;
-      vid.autoplay = true;
-      vid.loop = true;
-      vid.muted = true;
-      vid.setAttribute('playsinline', '');
-      if (projectId === 'parametric-speaker') {
-        vid.setAttribute('data-allow-sound', 'true');
-        vid.title = 'Click to enable sound';
-      }
-      var item = document.createElement('div');
-      item.className = 'gallery-item gallery-item-video';
-      item.appendChild(vid);
-      viewer.appendChild(item);
-      attachMediaFallback(vid, 'Media unavailable');
-    } else if (nextMedia.type === 'image') {
-      var img = document.createElement('img');
-      img.src = nextMedia.src;
-      img.alt = section.querySelector('.project-title').textContent;
-      var item = document.createElement('div');
-      item.className = 'gallery-item';
-      item.appendChild(img);
-      viewer.appendChild(item);
-      attachMediaFallback(img, 'Image unavailable');
-    }
-
     section.currentMediaIndex = nextIndex;
-
-    // Update counter
-    var counter = section.querySelector('.media-counter');
-    if (counter) {
-      counter.textContent = (nextIndex + 1) + ' / ' + mediaArray.length;
-    }
-
+    renderMediaAtIndex(section, nextIndex);
     syncSoundEnabledVideos();
+    updateGalleryChrome(section);
   });
 
   var soundVideoObserver = new IntersectionObserver(function (entries) {
