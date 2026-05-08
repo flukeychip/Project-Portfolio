@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /assets/Misc/me.png
+Disallow: /assets/Misc/Alexander_Arens_resume.pdf
 
 Sitemap: https://flukeychip.github.io/Project-Portfolio/sitemap.xml
