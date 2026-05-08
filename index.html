@@ -101,7 +101,7 @@
         </div>
         <div class="about-buttons">
           <a href="assets/Misc/Alexander_Arens_resume.pdf?v=20260507" class="btn" download>View Resume</a>
-          <a href="mailto:alexander.arens04@gmail.com" class="btn btn-outline">Email Me</a>
+          <a id="email-btn" class="btn btn-outline" style="cursor:pointer;">Email Me</a>
         </div>
       </div>
     </div>
@@ -117,5 +117,15 @@
   <!-- SCRIPTS -->
   <script src="js/projects.js?v=30"></script>
   <script src="js/main.js?v=51"></script>
+  <script>
+    // Email assembled at runtime — keeps raw HTML clean from scrapers.
+    // Google runs JS so it still indexes the address for search.
+    (function() {
+      var u = 'alexander.arens04';
+      var d = 'gmail.com';
+      var a = document.getElementById('email-btn');
+      if (a) { a.href = 'mailto:' + u + '@' + d; }
+    })();
+  </script>
 </body>
 </html>
