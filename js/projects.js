@@ -27,9 +27,9 @@
 const projects = [
   {
     id: "6dof-arm",
-    name: "6-DOF Robot Arm (WIP)",
+    name: "6-DOF Robot Arm",
     tagline: "Six-degree-of-freedom articulated robot arm",
-    description: "Inspired by the Universal Robots UR16e on campus, I am building a six-degree-of-freedom robot arm. My main goal is to design an efficient robotic arm, using 20:1 cycloidal drives for the base, shoulder, and elbow, and 8:1 cycloidal drives for the wrists. I am developing a PCB for each motor. I plan to integrate the driver, IMU, microcontroller, and power regulation to the reduce wiring on each joint. Once the design is finalized, I plan to train the arm in Isaac Sim to clean my desk.",
+    description: "This is the most in-depth project I have taken on. I was inspired by the Universal Robots UR3e arms in a campus design lab, but at $20,000 they were out of my price range, so I built my own. With parts on hand, about $100 from Amazon, and an old 3D printer, I built a six-degree-of-freedom arm: 3D printed 20:1 cycloidal drives, carbon fiber struts, belt driven remote actuation, magnetic Hall effect sensors, and a Jetson running it.</p><p>It is not perfect yet. The printed drives do not hold tight enough tolerances, so the next set gets laser cut from aluminum, and the fixed I2C address on the sensors forces a multiplexer, so I am moving to parts with configurable addresses. After that comes a force sensitive gripper that commands force instead of position, using a camera to estimate what each object needs.",
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
     model: null,
     images: [
