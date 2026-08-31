@@ -3,7 +3,7 @@
   --bg-color: #FAFAFC;
   --text-main: #111111;
   --text-muted: #666666;
-  --accent: #10B981;
+  --accent: #0F4C81;
   --card-bg: #FFFFFF;
   --dark-block: #222222;
   --border: #EAEAEA;
@@ -913,5 +913,74 @@ nav {
   .btn {
     width: 100%;
     text-align: center;
+  }
+}
+
+/* ===== MOBILE REFINEMENTS ===== */
+
+/* On phones the URL bar expands/collapses, so 100vh is taller than what's actually
+   visible and the hero's content gets clipped. dvh tracks the real viewport, and it
+   also keeps this in sync with the window.innerHeight the scroll math in main.js uses. */
+@supports (height: 100dvh) {
+  .hero {
+    height: 100dvh;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding: 4rem 5%;
+  }
+
+  /* 350px cards nearly fill a phone screen and hide the "there's more to swipe"
+     affordance. Narrower cards let the next one peek in from the edge. */
+  .carousel-card {
+    flex: 0 0 min(78vw, 300px);
+  }
+
+  .carousel-container {
+    gap: 1rem;
+    padding: 0 4%;
+    /* The feathered mask hides the peeking card on small screens — narrow it. */
+    mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 2%, black 98%, transparent 100%);
+    scroll-snap-type: x proximity;
+  }
+
+  .carousel-card {
+    scroll-snap-align: center;
+  }
+
+  /* 8rem margins + 5rem padding is a lot of dead scrolling on a phone. */
+  .project-detail {
+    margin: 4rem auto;
+    padding-top: 3rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .hero {
+    padding: 3rem 5%;
+  }
+
+  .project-detail {
+    margin: 3rem auto;
+    padding-top: 2.5rem;
+  }
+
+  /* Comfortable tap targets — 0.8rem nav links are hard to hit accurately. */
+  .nav-links a {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.25rem;
+    display: inline-block;
+  }
+
+  .skill-badge {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .carousel-card {
+    flex: 0 0 82vw;
   }
 }

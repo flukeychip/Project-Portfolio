@@ -11,6 +11,17 @@
   var isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
   var lockScrollBehavior = isSafari ? 'instant' : 'auto';
 
+  // The carousel scroll-lock is released ONLY by `wheel` events. Touch devices never
+  // fire `wheel`, so a phone that enters carousel mode has no way back out — the page
+  // would pin itself at the lock point permanently. Disable the hijack on touch and
+  // narrow viewports; the carousel is a native horizontal-scroll strip there instead.
+  var isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches ||
+    ('ontouchstart' in window);
+  function carouselLockSupported() {
+    return !isTouchDevice && window.innerWidth > 900;
+  }
+  var useCarouselLock = carouselLockSupported();
+
   function toAssetPath(pathValue) {
     if (!pathValue || typeof pathValue !== 'string') return pathValue;
     if (
@@ -510,6 +521,17 @@
   updateSpacer();
   window.addEventListener('resize', updateSpacer);
 
+  // Rotating a phone or narrowing a desktop window must never strand the page in a
+  // locked state that only `wheel` can release.
+  window.addEventListener('resize', function () {
+    var wasSupported = useCarouselLock;
+    useCarouselLock = carouselLockSupported();
+    if (wasSupported && !useCarouselLock && inCarouselMode) {
+      inCarouselMode = false;
+      carouselDone = true;
+    }
+  });
+
   let inCarouselMode  = false;
   let carouselDone    = false;
   let blocking        = false;
@@ -570,7 +592,8 @@
     applyTransforms(scrollY);
 
     // Enter carousel mode when carousel center reaches viewport center
-    if (!carouselDone && !inCarouselMode && Math.abs(carouselCenterInViewport() - vp / 2) < 20) {
+    if (useCarouselLock && !carouselDone && !inCarouselMode &&
+        Math.abs(carouselCenterInViewport() - vp / 2) < 20) {
       inCarouselMode = true;
       blocking = true;
       window.scrollTo({ top: scrollY2, left: 0, behavior: lockScrollBehavior });
@@ -580,6 +603,8 @@
   });
 
   window.addEventListener('wheel', function (e) {
+    if (!useCarouselLock) return;
+
     if (carouselDone) {
       // Carousel permanently done — let browser scroll natively (preserves momentum like phase 1)
       return;

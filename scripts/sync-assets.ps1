@@ -13,7 +13,8 @@ param(
     "public",
     "scripts",
     "staging",
-    "node_modules"
+    "node_modules",
+    "nfc-card"
   )
 )
 
