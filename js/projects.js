@@ -29,11 +29,17 @@ const projects = [
     id: "nfc-business-card",
     name: "NFC PCB Business Card",
     tagline: "A business card that is also a circuit board",
-    description: "A business card that is also a PCB. Tapping it with a phone opens a landing page, and there is no battery anywhere on the board -- it harvests power from the phone's own radio field. I designed the three-turn antenna coil that runs around the edge of the card, sized for an NTAG I2C Plus tag on standard FR4 and tuned to resonate at the 13.56 MHz NFC carrier.</p><p>The front silkscreen carries my name, contact details, and a QR code, so the card still does its job when there is no signal at all. That matters at a career fair, where reception is saturated and a tap may never load anything. The page it opens is framed by the board's own artwork, so whoever taps the card is looking at a picture of the thing in their hand.",
+    description: "This is probably the project that brought you here. Last Industrial Roundtable I handed out a 3D printed card with an off the shelf NFC tag from Amazon inside it; this time I wanted to go further. It is hard to think of a better way to say electrical engineer than handing someone a circuit board that doubles as the project.</p><p>That meant learning how NFC tags and their antennas actually work, which was easier than I expected: NXP publishes a calculator that takes the guesswork out of sizing the coil, and the rest was the datasheet and KiCad. The card carries a three turn antenna around its edge, tuned for an NTAG I2C Plus on FR4 at the 13.56 MHz carrier, and no battery: it runs on power harvested from the phone's own field.</p><p>The silkscreen carries my name, contact details, and a QR code, so it still works with no signal, which matters at a career fair where reception is saturated. Boards came from JLCPCB. The page it opens is framed by the board's own artwork, so whoever taps it is looking at a picture of the thing in their hand.",
     skills: ["PCB Design", "RF / Antenna Design", "KiCad", "NFC", "Web"],
     model: null,
-    images: [],
-    timeline: [],
+    images: [
+      "NFC%20business%20card/nfc-pcb-layout.png"
+    ],
+    timeline: [
+      { src: "NFC%20business%20card/nfc-antenna-tool.png",       label: "Tag Selection"   },
+      { src: "NFC%20business%20card/nfc-antenna-parameters.png", label: "Antenna Sizing"  },
+      { src: "NFC%20business%20card/nfc-equivalent-circuit.png", label: "Matching Check"  }
+    ],
     files: [
       { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/" }
     ]
@@ -45,10 +51,14 @@ const projects = [
     description: "This is the most in-depth project I have taken on. I was inspired by the Universal Robots UR3e arms in a campus design lab, but at $20,000 they were out of my price range, so I built my own. With parts on hand, about $100 from Amazon, and an old 3D printer, I built a six-degree-of-freedom arm: 3D printed 20:1 cycloidal drives, carbon fiber struts, belt driven remote actuation, magnetic Hall effect sensors, and a Jetson running it.</p><p>It is not perfect yet. The printed cycloidal drives do not hold tight enough tolerances, which shows up as backlash at the wrist, so the next set gets laser cut from aluminum. The magnetic sensors have a fixed I2C address, so every joint runs back through a multiplexer; parts with configurable addresses would let them daisy chain and remove most of that wiring. The NEMA 17 steppers are near their limit on the heavier joints, so the base, shoulder and elbow move up to NEMA 23. It also needs an end effector: a force sensitive gripper that commands force instead of position.",
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
     model: null,
-    images: [
-      "6dof%20arm/Screenshot%202026-03-04%20224359.png"
+    videos: [
+      "6dof%20arm/arm-demo-1.mp4",
+      "6dof%20arm/arm-demo-2.mp4"
     ],
-    timeline: [],
+    images: [],
+    timeline: [
+      { src: "6dof%20arm/Screenshot%202026-03-04%20224359.png", label: "CAD Design" }
+    ],
     files: []
   },
   {
