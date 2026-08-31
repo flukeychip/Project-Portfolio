@@ -26,6 +26,19 @@
 
 const projects = [
   {
+    id: "nfc-business-card",
+    name: "NFC PCB Business Card",
+    tagline: "A business card that is also a circuit board",
+    description: "A business card that is also a PCB. Tapping it with a phone opens a landing page, and there is no battery anywhere on the board -- it harvests power from the phone's own radio field. I designed the three-turn antenna coil that runs around the edge of the card, sized for an NTAG I2C Plus tag on standard FR4 and tuned to resonate at the 13.56 MHz NFC carrier.</p><p>The front silkscreen carries my name, contact details, and a QR code, so the card still does its job when there is no signal at all. That matters at a career fair, where reception is saturated and a tap may never load anything. The page it opens is framed by the board's own artwork, so whoever taps the card is looking at a picture of the thing in their hand.",
+    skills: ["PCB Design", "RF / Antenna Design", "KiCad", "NFC", "Web"],
+    model: null,
+    images: [],
+    timeline: [],
+    files: [
+      { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/" }
+    ]
+  },
+  {
     id: "6dof-arm",
     name: "6-DOF Robot Arm",
     tagline: "Six-degree-of-freedom articulated robot arm",
