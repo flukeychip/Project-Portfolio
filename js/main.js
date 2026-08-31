@@ -15,8 +15,13 @@
   // fire `wheel`, so a phone that enters carousel mode has no way back out — the page
   // would pin itself at the lock point permanently. Disable the hijack on touch and
   // narrow viewports; the carousel is a native horizontal-scroll strip there instead.
-  var isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches ||
-    ('ontouchstart' in window);
+  // Detect a touch-FIRST device, not merely a touch-capable one. `'ontouchstart' in
+  // window` is true in desktop Chrome even with no touchscreen at all (maxTouchPoints
+  // 0, hover: hover, pointer: fine), so using it here disabled the carousel lock and
+  // the 3D pointer tracking on ordinary desktops. The media query is the correct test:
+  // it reports the PRIMARY input, so a touchscreen laptop with a mouse still counts as
+  // a pointer device.
+  var isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   function carouselLockSupported() {
     return !isTouchDevice && window.innerWidth > 900;
   }
@@ -175,15 +180,21 @@
       const light2 = new THREE.AmbientLight(0xffffff, 0.5);
       this.scene.add(light2);
 
-      // Mouse tracking
-      this.mouseListener = (e) => {
-        const rect = this.container.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width * 2 - 1;   // -1 to 1
-        const y = -(e.clientY - rect.top) / rect.height * 2 + 1;  // -1 to 1
-        this.targetRotationY = this.baseRotationY + x * Math.PI / 4;   // ±45 degrees from base
-        this.targetRotationX = y * Math.PI / 6;   // ±30 degrees
-      };
-      document.addEventListener('mousemove', this.mouseListener);
+      // Mouse tracking — only where there is a real pointer to track. A touch device
+      // fires a synthetic mousemove on tap, which snaps the model to wherever the
+      // finger landed and then leaves it there: it reads as broken rather than
+      // interactive. Without the listener the model simply rests at its base
+      // rotation, which is what a phone should show.
+      if (!isTouchDevice) {
+        this.mouseListener = (e) => {
+          const rect = this.container.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width * 2 - 1;   // -1 to 1
+          const y = -(e.clientY - rect.top) / rect.height * 2 + 1;  // -1 to 1
+          this.targetRotationY = this.baseRotationY + x * Math.PI / 4;   // ±45 degrees from base
+          this.targetRotationX = y * Math.PI / 6;   // ±30 degrees
+        };
+        document.addEventListener('mousemove', this.mouseListener);
+      }
 
       // Only animate when visible in viewport
       this.observer = new IntersectionObserver((entries) => {
