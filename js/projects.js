@@ -52,8 +52,7 @@ const projects = [
     skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
     model: null,
     videos: [
-      "6dof%20arm/arm-demo-1.mp4",
-      "6dof%20arm/arm-demo-2.mp4"
+      "6dof%20arm/arm-demo-1.mp4"
     ],
     images: [],
     timeline: [
