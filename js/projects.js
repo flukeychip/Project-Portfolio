@@ -28,7 +28,7 @@ const projects = [
   {
     id: "nfc-business-card",
     name: "NFC PCB Business Card",
-    tagline: "A business card that is also a circuit board",
+    tagline: "Tap-to-open card with a custom NFC antenna",
     description: "This is probably the project that brought you here. Last Industrial Roundtable I handed out a 3D printed card with an off the shelf NFC tag from Amazon inside it; this time I wanted to go further. It is hard to think of a better way to say electrical engineer than handing someone a circuit board that doubles as the project.</p><p>That meant learning how NFC tags and their antennas actually work, which was easier than I expected: NXP publishes a calculator that takes the guesswork out of sizing the coil, and the rest was the datasheet and KiCad. The card carries a three turn antenna around its edge, tuned for an NTAG I2C Plus on FR4 at the 13.56 MHz carrier, and no battery.</p><p>The silkscreen carries my name, contact details, and a QR code, so it still works with no signal, which matters at a career fair where reception is saturated. The page it opens is framed by the board's own artwork, so whoever taps it is looking at a picture of the thing in their hand.",
     skills: ["PCB Design", "RF / Antenna Design", "KiCad", "NFC", "Web"],
     model: null,
@@ -47,7 +47,7 @@ const projects = [
   {
     id: "laser-turret",
     name: "Vision-Guided Laser Turret",
-    tagline: "Pan-tilt turret that finds a drone and keeps a laser on it",
+    tagline: "Drone-tracking pan-tilt on a differential wrist",
     description: "I am building this for the Purdue Institute of Chips and AI Hackathon showcase on September 22nd. It is a turret that spots a drone and keeps a laser tracking it as it moves, while making sure the beam never lands on anything living. I designed the controller board in KiCad around an RP2040, two A4988 stepper drivers, and a 9-axis IMU, and populated it myself. The motion platform is a bevel gear differential wrist printed in SLS nylon, with both steppers mounted off the moving assembly and driving it through belts, so the only mass that has to move is the optics.</p><p>Getting the board working taught me the most. Both motors buzzed and both drivers ran hot, which looked like a firmware bug until I traced the pinout on the copper and found the motor cable splitting each coil across the wrong pins. One driver also had its step and direction pins mislabeled in the schematic, so the firmware now rebuilds its pin map from the board itself and refuses to flash if the two disagree. The hardware is all finished now. The perception side is designed but not written yet, so tracking is not proven end to end.",
     skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision"],
     model: null,
