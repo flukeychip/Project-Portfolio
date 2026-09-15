@@ -51,7 +51,13 @@ const projects = [
     description: "I am building this for the Purdue Institute of Chips and AI Hackathon showcase on September 22nd. It is a turret that spots a drone and keeps a laser tracking it as it moves, while making sure the beam never lands on anything living. I designed the controller board in KiCad around an RP2040, two A4988 stepper drivers, and a 9-axis IMU, and populated it myself. The motion platform is a bevel gear differential wrist printed in SLS nylon, with both steppers mounted off the moving assembly and driving it through belts, so the only mass that has to move is the optics.</p><p>Getting the board working taught me the most. Both motors buzzed and both drivers ran hot, which looked like a firmware bug until I traced the pinout on the copper and found the motor cable splitting each coil across the wrong pins. One driver also had its step and direction pins mislabeled in the schematic, so the firmware now rebuilds its pin map from the board itself and refuses to flash if the two disagree. The hardware is all finished now. The perception side is designed but not written yet, so tracking is not proven end to end.",
     skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision"],
     model: null,
-    images: [],
+    images: [
+      "Laser%20Turret/turret-front.jpg",
+      "Laser%20Turret/turret-pitched.jpg",
+      "Laser%20Turret/turret-differential.jpg",
+      "Laser%20Turret/turret-controller-board.jpg",
+      "Laser%20Turret/turret-bench.jpg"
+    ],
     timeline: [],
     files: []
   },
