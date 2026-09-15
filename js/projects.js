@@ -45,6 +45,17 @@ const projects = [
     ]
   },
   {
+    id: "laser-turret",
+    name: "Vision-Guided Laser Turret",
+    tagline: "Pan-tilt turret that finds a drone and keeps a laser on it",
+    description: "This is where my Pan-Tilt Mount was always heading. That one worked, but the motion was guesswork, so this time I designed the platform properly. It is a turret that spots a drone, confirms it is not a bird, and keeps a 5 mW laser tracking it. I designed the controller board in KiCad around an RP2040, two A4988 drivers, and a 9-axis IMU, and populated it myself. The platform is a bevel gear differential wrist with both steppers mounted off the moving assembly, so the only mass I accelerate is the optics. Step pulses come from the RP2040's PIO blocks rather than the CPU, which holds timing error to 0.1 percent out to 20,000 steps per second.</p><p>Bring-up taught me the most. Both motors buzzed and both drivers ran hot, which looked like a firmware bug until I traced the pinout on the copper and found the motor cable splitting each coil across the wrong pins. One driver also had STEP and DIR mislabeled in the schematic, so the firmware now rebuilds its pin map from the board and refuses to flash if the two disagree. The perception stack is designed but not written, the nylon parts are still printing, and end to end tracking is not proven. It goes to the Purdue Institute of Chips and AI Hackathon showcase on 22 September.",
+    skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision"],
+    model: null,
+    images: [],
+    timeline: [],
+    files: []
+  },
+  {
     id: "6dof-arm",
     name: "6-DOF Robot Arm",
     tagline: "Six-degree-of-freedom articulated robot arm",
