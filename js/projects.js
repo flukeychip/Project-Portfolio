@@ -41,7 +41,7 @@ const projects = [
       { src: "NFC%20business%20card/nfc-equivalent-circuit.png", label: "Matching Check"  }
     ],
     files: [
-      { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/" }
+      { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/?s=web" }
     ]
   },
   {
