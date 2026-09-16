@@ -51,7 +51,12 @@ const projects = [
     description: "I am building this for the Purdue Institute of Chips and AI Hackathon showcase on September 22nd. It is a turret that spots a drone and keeps a laser tracking it as it moves. It is demoed in a room full of people, so tracking never stops but the laser cuts out before the beam gets near anyone. I designed the controller board in KiCad as a carrier for a Pico and two A4988 drivers, with the buck regulator on board, and populated it myself. The 9-axis IMU rides on the payload, not the base. The motion platform is a bevel gear differential wrist printed in SLS nylon and PLA, with both steppers mounted off the moving assembly and driving it through belts, so the only mass that has to move is the optics.</p><p>Getting the board working taught me the most. Both motors buzzed and both drivers ran hot, which looked like a firmware bug until I traced the pinout on the copper and found the motor cable splitting each coil across the wrong pins. One driver also had its step and direction pins mislabeled in the schematic, so the firmware now rebuilds its pin map from the board and refuses to flash if the two disagree. The hardware is all finished now. The perception side is designed but not written yet, so tracking is not proven end to end.",
     skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision"],
     model: null,
+    videos: [
+      "Laser%20Turret/turret-demo-1.mp4",
+      "Laser%20Turret/turret-demo-2.mp4"
+    ],
     images: [
+      "Laser%20Turret/turret-laser.jpg",
       "Laser%20Turret/turret-front.jpg",
       "Laser%20Turret/turret-pitched.jpg",
       "Laser%20Turret/turret-differential.jpg",
