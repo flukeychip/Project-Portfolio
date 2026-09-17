@@ -127,5 +127,73 @@
       if (a) { a.href = 'mailto:' + u + '@' + d; }
     })();
   </script>
+
+  <script>
+    // Cookieless analytics (GoatCounter). Every hit is a fire-and-forget pixel
+    // fired after load, never a blocking subresource: if the endpoint is slow,
+    // blocked, or offline, nothing about this page changes. No cookies and no
+    // cross-site identifiers are set, so no consent banner is required.
+    //
+    // Shares one GoatCounter site with the NFC card page. Card taps land under
+    // /card/*, everything here lands under /portfolio/*.
+    (function () {
+      var COUNTER_CODE = 'flukeychip';
+      if (!COUNTER_CODE) return;
+
+      function hit(path, title) {
+        try {
+          new Image().src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
+            + '?p=' + encodeURIComponent(path)
+            + '&t=' + encodeURIComponent(title)
+            + '&r=' + encodeURIComponent(document.referrer || '');
+        } catch (e) {}
+      }
+
+      addEventListener('load', function () {
+        hit('/portfolio', 'Portfolio');
+
+        // This is a single page, so one landing pageview says nothing about
+        // what actually held someone's attention. Count a project the first
+        // time it crosses the middle of the screen.
+        //
+        // The root is shrunk to a thin band across the centre of the viewport
+        // rather than using a visibility ratio, because a ratio cannot work
+        // here: these sections run from 1250px to over 3000px tall, so
+        // anything taller than two viewports could never reach a 0.5 ratio
+        // and the longest projects would never count at all. A centre band is
+        // independent of section height, and re-evaluates on reflow, so
+        // sections still count correctly as lazy images load in above them.
+        try {
+          if (!('IntersectionObserver' in window)) return;
+          var sections = document.querySelectorAll('.project-detail');
+          if (!sections.length) return;
+          var seen = {};
+          var obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              var id = entry.target.id;
+              if (!id || seen[id]) return;
+              seen[id] = true;
+              obs.unobserve(entry.target);
+              hit('/portfolio/project/' + id, 'Project: ' + id);
+            });
+          }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+          sections.forEach(function (el) { obs.observe(el); });
+        } catch (e) {}
+      });
+
+      // A resume download or an email click means someone is actually
+      // considering me, so those are worth separating from idle scrolling.
+      document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest ? e.target.closest('a') : null;
+        if (!a) return;
+        if (a.id === 'email-btn') { hit('/portfolio/email', 'Email clicked'); return; }
+        var href = a.getAttribute('href') || '';
+        if (href.indexOf('Alexander_Arens_resume.pdf') !== -1) {
+          hit('/portfolio/resume', 'Resume downloaded');
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
