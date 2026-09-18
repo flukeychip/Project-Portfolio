@@ -140,7 +140,27 @@
       var COUNTER_CODE = 'flukeychip';
       if (!COUNTER_CODE) return;
 
+      // My own visits would otherwise be a large share of the traffic on a
+      // site this small. Loading any page with #toggle-goatcounter flips this
+      // browser between counted and ignored, so I can silence my own devices
+      // once each. Storage is unavailable in some privacy modes, so every
+      // access is guarded: failing to read the flag must never stop the page.
+      function skipped() {
+        try { return localStorage.getItem('skipgc') === '1'; } catch (e) { return false; }
+      }
+
+      if (location.hash === '#toggle-goatcounter') {
+        try {
+          var off = !skipped();
+          localStorage.setItem('skipgc', off ? '1' : '0');
+          alert('Analytics ' + (off ? 'OFF' : 'ON') + ' for this browser.');
+        } catch (e) {
+          alert('Could not save that: this browser is blocking local storage.');
+        }
+      }
+
       function hit(path, title) {
+        if (skipped()) return;
         try {
           new Image().src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
             + '?p=' + encodeURIComponent(path)
