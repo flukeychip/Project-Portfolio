@@ -140,6 +140,11 @@
       var COUNTER_CODE = 'flukeychip';
       if (!COUNTER_CODE) return;
 
+      // Only ever count the live site. Local previews and any test server are
+      // not real visits, and they were polluting the numbers during
+      // development. This is a hard guard, not a preference.
+      if (location.hostname !== 'flukeychip.github.io') return;
+
       // My own visits would otherwise be a large share of the traffic on a
       // site this small. Loading any page with #toggle-goatcounter flips this
       // browser between counted and ignored, so I can silence my own devices
