@@ -200,7 +200,7 @@ const projects = [
     id: "drone",
     name: "3D Printed Drone With Bistable Arms",
     tagline: "Custom-built folding arm quadcopter",
-    description: "This project sprang from boredom during COVID, when my school was closed. Coincidentally, my school had just given me drone parts because they did not know what to do with them. I spent a few months refining the design to be as lightweight and inexpensive as possible. It uses an ultrasonic sensor to estimate height from the ground, and its bistable locking arms are held in position using pen springs (putting a few together is surprisingly effective). Unfortunately, I had no idea what I was doing with PID tuning, and the drone would seem to be working fine, then oscillate wildly. This may also have been due to PETG's relative flexibility. If I revisit this project, I would redesign it from the ground up using everything I have learned since then.",
+    description: "I was given a box of surplus drone parts and set out to build the lightest, least expensive folding quadcopter I could. It uses an ultrasonic sensor to estimate height from the ground, and its bistable locking arms are held in position using pen springs (putting a few together is surprisingly effective). Unfortunately, I had no idea what I was doing with PID tuning, and the drone would seem to be working fine, then oscillate wildly. This may also have been due to PETG's relative flexibility. If I revisit this project, I would redesign it from the ground up using everything I have learned since then.",
     skills: ["Flight Controller", "ESC", "CAD", "3D Printing", "PID Tuning"],
     model: null,
     images: [
