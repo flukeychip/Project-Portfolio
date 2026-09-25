@@ -539,7 +539,8 @@ nav {
   z-index: 10;
 }
 
-.timeline-item img {
+.timeline-item img,
+.timeline-item video {
   width: 100%;
   height: 110px;
   object-fit: cover;
@@ -550,7 +551,8 @@ nav {
   transition: height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), object-fit 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
-.timeline-item:hover img {
+.timeline-item:hover img,
+.timeline-item:hover video {
   height: 158px;
   object-fit: contain;
   border-color: var(--accent);

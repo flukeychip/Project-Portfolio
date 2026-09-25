@@ -32,19 +32,19 @@ const projects = [
     description: "My university was hosting a competition where teams would design a project in a limited time frame that incorporated AI and hardware. I had always had this as a project in the back of my mind and I finally got the chance to build and show it off. We started by brainstorming and came up with key points we needed our system to have. Above all, it is meant to protect humans and living beings, so it was designed from the ground up with safety in mind.</p><p>Additionally, we wanted to make the most of the technology we had available to us. So we used computer vision and a custom data set with over 3,600 images, including a thousand negatives to inhibit the system from identifying someone's water bottle or phone as a false positive. We then integrated sensors to give real-time feedback and allow for complete autonomy.</p><p>The turret itself features a robotic wrist differential, which allows the payload to be remotely actuated without adding unnecessary weight. On the payload, there are wide and narrow FOV cameras to detect threats from a variety of distances. Additionally, it contains a 9-axis IMU to allow for contactless homing and to seamlessly fuse the sensor data with the (time stamped) motor commands and computer vision data. Then, there is a 5 mW laser (for demonstration purposes) mounted to the payload that is switched on or off by the perception / classification stack.</p><p>In 3 weeks, my team had a finished prototype, and we spent the next few days fine tuning it before the competition. We then received an email saying we made finalists for the competition and were invited to demonstrate it in front of industry leaders from Oracle, Micron and Nvidia, where we took second place.",
     skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision", "Machine Learning"],
     model: null,
-    videos: [
-      "Laser%20Turret/turret-demo-1.mp4",
-      "Laser%20Turret/turret-demo-2.mp4"
+    turret: "Laser%20Turret/wrist_mesh.json",
+    videos: [],
+    images: [],
+    timeline: [
+      { src: "Laser%20Turret/turret-controller-board.jpg", label: "Controller Board"   },
+      { src: "Laser%20Turret/turret-differential.jpg",     label: "Differential Wrist" },
+      { src: "Laser%20Turret/turret-front.jpg",            label: "Assembled"          },
+      { src: "Laser%20Turret/turret-pitched.jpg",          label: "Pitch Axis"         },
+      { src: "Laser%20Turret/turret-bench.jpg",            label: "Bench Testing"      },
+      { src: "Laser%20Turret/turret-laser.jpg",            label: "Laser Mounted"      },
+      { src: "Laser%20Turret/turret-demo-1.mp4",           label: "Tracking Demo"      },
+      { src: "Laser%20Turret/turret-demo-2.mp4",           label: "Laser Tracking"     }
     ],
-    images: [
-      "Laser%20Turret/turret-laser.jpg",
-      "Laser%20Turret/turret-front.jpg",
-      "Laser%20Turret/turret-pitched.jpg",
-      "Laser%20Turret/turret-differential.jpg",
-      "Laser%20Turret/turret-controller-board.jpg",
-      "Laser%20Turret/turret-bench.jpg"
-    ],
-    timeline: [],
     files: []
   },
   {

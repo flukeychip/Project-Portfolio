@@ -43,6 +43,7 @@
   function normalizeProjectPaths(project) {
     return Object.assign({}, project, {
       model: toAssetPath(project.model),
+      turret: toAssetPath(project.turret),
       images: (project.images || []).map(toAssetPath),
       videos: (project.videos || []).map(toAssetPath),
       files: (project.files || []).map(function (file) {
@@ -341,6 +342,24 @@
     var m = section.mediaArray[index];
     var ptitle = section.querySelector('.project-title').textContent;
 
+    if (m.type === 'turret') {
+      var tcontainer = document.createElement('div');
+      tcontainer.className = 'gallery-item gallery-item-3d';
+      tcontainer.id = '3d-' + projectId;
+      viewer.appendChild(tcontainer);
+
+      var tv = new TurretViewer(tcontainer);
+      if (!tv.init()) {
+        tryDowngradeFromFailed3D(section, tv);
+        return;
+      }
+      section.viewer3d = tv;
+      tv.loadModel(m.src, function () {
+        tryDowngradeFromFailed3D(section, tv);
+      });
+      return;
+    }
+
     if (m.type === '3d') {
       var container = document.createElement('div');
       container.className = 'gallery-item gallery-item-3d';
@@ -393,7 +412,8 @@
   function tryDowngradeFromFailed3D(section, viewer3d) {
     var idx = section.currentMediaIndex;
     if (!section.mediaArray || idx < 0 || idx >= section.mediaArray.length) return;
-    if (section.mediaArray[idx].type !== '3d') return;
+    var failedType = section.mediaArray[idx].type;
+    if (failedType !== '3d' && failedType !== 'turret') return;
 
     section.mediaArray.splice(idx, 1);
 
@@ -641,6 +661,7 @@
 
   // ── Render Project Details ─────────────────────────────────
   var pending3D = [];
+  var pendingTurret = [];
 
   normalizedProjects.forEach(function (p, idx) {
     const section = document.createElement('section');
@@ -654,6 +675,9 @@
     // Gallery order: 3D (CAD) → videos → images. If WebGL is unavailable or the .glb
     // fails to load, that 3D slot is removed and the viewer shows the next item.
     var mediaArray = [];
+    if (p.turret) {
+      mediaArray.push({ type: 'turret', src: p.turret });
+    }
     if (p.model) {
       mediaArray.push({ type: '3d', src: p.model });
     }
@@ -681,7 +705,7 @@
 
       // Render first media item
       var firstMedia = mediaArray[0];
-      if (firstMedia.type === '3d') {
+      if (firstMedia.type === '3d' || firstMedia.type === 'turret') {
         galleryHTML += '<div class="gallery-item gallery-item-3d" id="3d-' + p.id + '"></div>';
       } else if (firstMedia.type === 'video') {
         var allowSoundOnClick = p.id === 'parametric-speaker';
@@ -712,9 +736,16 @@
       var timelineItems = p.timeline.map(function(item, i) {
         var src   = typeof item === 'string' ? item : item.src;
         var label = typeof item === 'string' ? ('Step ' + (i + 1)) : item.label;
+        // The timeline used to assume every step was a still. A video step
+        // rendered as an <img> pointing at an .mp4, which fails silently and
+        // leaves an empty box, so pick the element from the extension.
+        var isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(src);
+        var mediaEl = isVideo
+          ? '<video src="' + src + '" autoplay loop muted playsinline preload="metadata"></video>'
+          : '<img src="' + src + '" alt="' + label + '" loading="lazy">';
         return '<div class="timeline-item">' +
           '<span class="timeline-step">' + (i + 1) + '</span>' +
-          '<img src="' + src + '" alt="' + label + '" loading="lazy">' +
+          mediaEl +
           '<div class="timeline-label">' + label + '</div>' +
         '</div>';
       }).join('');
@@ -753,8 +784,8 @@
     // Hook error fallbacks on any rendered media (first gallery item + timeline images)
     var initialMediaEl = section.querySelector('.media-viewer video, .media-viewer img');
     attachMediaFallback(initialMediaEl, 'Media unavailable');
-    section.querySelectorAll('.timeline-item img').forEach(function (img) {
-      attachMediaFallback(img, 'Image unavailable');
+    section.querySelectorAll('.timeline-item img, .timeline-item video').forEach(function (el) {
+      attachMediaFallback(el, 'Media unavailable');
     });
 
     // Store media array on the section for carousel navigation
@@ -765,7 +796,33 @@
     if (mediaArray.length > 0 && mediaArray[0].type === '3d') {
       pending3D.push({ section: section, src: mediaArray[0].src });
     }
+    if (mediaArray.length > 0 && mediaArray[0].type === 'turret') {
+      pendingTurret.push({ section: section, src: mediaArray[0].src });
+    }
   });
+
+  // The turret viewer needs Three.js but not GLTFLoader — its geometry
+  // comes from a JSON triangle soup, not a glTF scene.
+  if (pendingTurret.length > 0) {
+    loadScriptsSequential(
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=7'],
+      function () {
+        pendingTurret.forEach(function (item) {
+          var container = document.getElementById('3d-' + item.section.id);
+          if (!container) return;
+          var viewer = new TurretViewer(container);
+          if (!viewer.init()) {
+            tryDowngradeFromFailed3D(item.section, viewer);
+            return;
+          }
+          item.section.viewer3d = viewer;
+          viewer.loadModel(item.src, function () {
+            tryDowngradeFromFailed3D(item.section, viewer);
+          });
+        });
+      }
+    );
+  }
 
   // Load Three.js only if at least one project has a 3D model
   if (pending3D.length > 0) {
