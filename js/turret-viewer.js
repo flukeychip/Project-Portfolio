@@ -314,21 +314,22 @@
     // the pitch axis, outboard toward their own frame plate, and they are
     // the bevels rather than the motors or end caps. Picked geometrically,
     // because the JSON carries no triangle-to-part mapping.
-    var cand = [];
+    // Picked by mass on each side of centre, not by how far outboard they
+    // sit: the frame hardware is further out than the gears, and sorting by
+    // |z| grabbed 265-triangle screws instead. Both sides must also resolve
+    // to a substantial body, or nothing is animated at all — a lopsided
+    // drivetrain is worse than a still one.
+    var gearA = null, gearB = null, bestA = 0, bestB = 0;
     keys.forEach(function (r) {
       var e = extent(v, bodies[r]);
       if (classifyStatic(e) !== C.gear) return;
       var cz = (e.z0 + e.z1) / 2;
       if (Math.abs(cz) < 12) return;            // central pulley sits near z=0
-      cand.push({ r: r, cz: cz, n: e.n });
+      if (e.n < 5000) return;                   // screws and standoffs
+      if (cz > 0 && e.n > bestA) { bestA = e.n; gearA = r; }
+      if (cz < 0 && e.n > bestB) { bestB = e.n; gearB = r; }
     });
-    cand.sort(function (a, b) { return Math.abs(b.cz) - Math.abs(a.cz); });
-
-    var gearA = null, gearB = null;
-    for (var i = 0; i < cand.length; i++) {
-      if (cand[i].cz > 0 && !gearA) gearA = cand[i].r;
-      if (cand[i].cz < 0 && !gearB) gearB = cand[i].r;
-    }
+    if (!gearA || !gearB) { gearA = null; gearB = null; }
 
     this.gearAPivot = new THREE.Group(); this.gearAPivot.position.copy(this.WC);
     this.gearBPivot = new THREE.Group(); this.gearBPivot.position.copy(this.WC);
@@ -544,67 +545,88 @@
      the cursor. Two-level grid search, coarse then refined, which is a few
      hundred cheap projections per frame and cannot fail to converge or
      wander outside the travel limits the way an iterative solve can. */
-  var SEARCH = [
-    { pitch: 8, yaw: 10 },   // coarse: whole travel
-    { pitch: 2, yaw: 2 },
-    { pitch: 0.5, yaw: 0.5 }
-  ];
+  var MAX_STEP_DEG = 12;    // per frame, keeps the head from teleporting
+  // mm along the beam, the point matched to the cursor. Measured, not
+  // picked: at 500 the reachable points span ~5000px against a ~640px
+  // canvas, so the cost surface is steep enough that the search walks to a
+  // travel limit and sticks. At 250 the span is ~730px, about one canvas.
+  var AIM_RANGE    = 250;
 
-  TurretViewer.prototype.screenDirFor = function (pitchDeg, yawDeg, rect) {
+  /* Where a point on the beam lands on screen, in pixels.
+
+     Matching the beam's projected DIRECTION instead of a point looks
+     equivalent and is not: a whole cone of 3D directions projects to the
+     same 2D direction, so two poses far apart score identically. The solver
+     flipped between them every frame, which is what made the payload thrash
+     while the cursor moved and settle when it stopped. Matching a point is
+     well conditioned and is also the more literal reading of "the laser
+     points at the cursor". */
+  TurretViewer.prototype.beamPointOnScreen = function (pitchDeg, yawDeg, rect) {
     var o = this.laserOrigin(pitchDeg, yawDeg);
     var d = this.forward(pitchDeg, yawDeg);
-    // A near point on the beam, not its far end: the far end can sit behind
-    // the camera, where projection is meaningless.
-    var near = o.clone().addScaledVector(d, 250);
-    var a = o.clone().project(this.camera);
-    var b = near.project(this.camera);
-    var vx = (b.x - a.x) * rect.width / 2;
-    var vy = -(b.y - a.y) * rect.height / 2;
-    var len = Math.hypot(vx, vy);
-    if (len < 1e-6) return null;
-    return { x: vx / len, y: vy / len, ox: a.x, oy: a.y };
+    var pt = o.addScaledVector(d, AIM_RANGE);
+    pt.project(this.camera);
+    if (pt.z > 1 || pt.z < -1) return null;          // behind the camera
+    return {
+      x: rect.left + (pt.x + 1) / 2 * rect.width,
+      y: rect.top + (1 - pt.y) / 2 * rect.height
+    };
   };
 
   TurretViewer.prototype.aimAtScreen = function (sx, sy, rect) {
     var self = this;
-    var probe = this.screenDirFor(this.state.pitch, this.state.yaw, rect);
-    if (!probe) return;
-    var boreX = rect.left + (probe.ox + 1) / 2 * rect.width;
-    var boreY = rect.top + (1 - probe.oy) / 2 * rect.height;
-    var wantX = sx - boreX, wantY = sy - boreY;
-    var wl = Math.hypot(wantX, wantY);
-    if (wl < 1e-3) return;
-    wantX /= wl; wantY /= wl;
 
-    function cost(p, y) {
-      var d = self.screenDirFor(p, y, rect);
-      if (!d) return Infinity;
-      return -(d.x * wantX + d.y * wantY);   // maximise alignment
+    function score(p, y) {
+      var s = self.beamPointOnScreen(p, y, rect);
+      if (!s) return -1e9;
+      return -Math.hypot(s.x - sx, s.y - sy);        // closer is better
     }
 
-    var bestP = 0, bestY = 0, best = Infinity;
-    var pLo = -PITCH_LIMIT, pHi = PITCH_LIMIT, yLo = -90, yHi = 90;
+    function refine(cp, cy, halfP, halfY) {
+      var bp = cp, by = cy, best = score(cp, cy);
+      for (var lvl = 0; lvl < 4; lvl++) {
+        var sp = halfP / 4, sy2 = halfY / 4;
+        for (var p = bp - halfP; p <= bp + halfP + 1e-9; p += sp) {
+          if (p < -PITCH_LIMIT || p > PITCH_LIMIT) continue;
+          for (var y = by - halfY; y <= by + halfY + 1e-9; y += sy2) {
+            if (y < -90 || y > 90) continue;
+            var a = score(p, y);
+            if (a > best) { best = a; bp = p; by = y; }
+          }
+        }
+        halfP = sp; halfY = sy2;
+      }
+      return { p: bp, y: by, a: best };
+    }
 
-    for (var lvl = 0; lvl < SEARCH.length; lvl++) {
-      var sp = SEARCH[lvl].pitch, sy2 = SEARCH[lvl].yaw;
-      for (var p = pLo; p <= pHi + 1e-9; p += sp) {
-        for (var y = yLo; y <= yHi + 1e-9; y += sy2) {
-          var c = cost(p, y);
-          if (c < best) { best = c; bestP = p; bestY = y; }
+    // Track from where the head already is, so small cursor moves make small
+    // pose changes.
+    var res = refine(this.state.pitch, this.state.yaw, 20, 20);
+
+    // Only sweep the whole travel when local tracking has genuinely lost it,
+    // e.g. the cursor jumped across the page.
+    if (res.a < -40) {
+      var bp = 0, by = 0, best = -1e9;
+      for (var p = -PITCH_LIMIT; p <= PITCH_LIMIT; p += 10) {
+        for (var y = -90; y <= 90; y += 12) {
+          var a = score(p, y);
+          if (a > best) { best = a; bp = p; by = y; }
         }
       }
-      pLo = Math.max(-PITCH_LIMIT, bestP - sp); pHi = Math.min(PITCH_LIMIT, bestP + sp);
-      yLo = Math.max(-90, bestY - sy2);        yHi = Math.min(90, bestY + sy2);
+      var g = refine(bp, by, 10, 12);
+      if (g.a > res.a) res = g;
     }
-    this.apply(bestP, bestY);
+
+    var np = clamp(res.p, this.state.pitch - MAX_STEP_DEG, this.state.pitch + MAX_STEP_DEG);
+    var ny = clamp(res.y, this.state.yaw - MAX_STEP_DEG, this.state.yaw + MAX_STEP_DEG);
+    this.apply(clamp(np, -PITCH_LIMIT, PITCH_LIMIT), clamp(ny, -90, 90));
   };
 
   TurretViewer.prototype.drainPointer = function () {
     if (!this.pendingMove || !this.ready) return;
-    var e = this.pendingMove; this.pendingMove = null;
     var rect = this.container.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    this.aimAtScreen(e.x, e.y, rect);
+    this.aimAtScreen(this.pendingMove.x, this.pendingMove.y, rect);
   };
 
   TurretViewer.prototype.animate = function () {

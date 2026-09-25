@@ -805,7 +805,7 @@
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=7'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=11'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
