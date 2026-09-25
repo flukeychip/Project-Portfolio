@@ -27,7 +27,6 @@
   var BELT_RATIO    = 60 / 26, MITER = 1.0;
   var N_DRIVE       = BELT_RATIO * MITER;   // payload degrees -> motor degrees
   var PITCH_LIMIT   = 90;     // degrees, mechanical
-  var TARGET_RANGE  = 1500;   // mm, radius of the aim sphere
   var HOME_VIEW     = { r: 520, th: 2.55, ph: 1.05 };
 
   // Part colours. Kept identical to the standalone sim so the two read as
@@ -629,12 +628,17 @@
 
     var origin = this.laserOrigin(pitchDeg, yawDeg);
     var dir = this.forward(pitchDeg, yawDeg);
-    var end = origin.clone().addScaledVector(dir, TARGET_RANGE);
+    // The beam stops where it hits, which is the same distance the solver
+    // aims at, which is where the drone is drawn. Running it on past the
+    // target read as a line pointing at something rather than a beam
+    // landing on it.
+    var reach = this.aimReach();
+    var end = origin.clone().addScaledVector(dir, reach);
 
     // Cylinders are built along +Y, so rotate that onto the beam and stretch.
     this.beam.position.copy(origin);
     this.beam.quaternion.setFromUnitVectors(UP_Y, dir);
-    this.beam.scale.set(1, TARGET_RANGE, 1);
+    this.beam.scale.set(1, reach, 1);
 
     this.beamDot.position.copy(end);
   };
@@ -700,6 +704,15 @@
      while the cursor moved and settle when it stopped. Matching a point is
      well conditioned and is also the more literal reading of "the laser
      points at the cursor". */
+  /* How far along the beam the aim point sits, in model units. Divided by
+     the root scale so it covers the same span in pixels whatever size the
+     model is drawn at: the carousel instance is at 0.42, and without this
+     it reaches only 42% as far across the screen before saturating. */
+  TurretViewer.prototype.aimReach = function () {
+    var k = this.root ? this.root.scale.x : 1;
+    return (this.aimRange || AIM_RANGE) / (k || 1);
+  };
+
   TurretViewer.prototype.beamPointOnScreen = function (pitchDeg, yawDeg, rect) {
     var o = this.laserOrigin(pitchDeg, yawDeg);
     var d = this.forward(pitchDeg, yawDeg);
@@ -707,8 +720,7 @@
     // pixels whatever size the model is drawn at. The mini instance is at
     // 0.42, and without this it can only reach 42% as far across the screen
     // before saturating, which looks like the beam refusing to follow.
-    var k = this.root ? this.root.scale.x : 1;
-    var pt = o.addScaledVector(d, (this.aimRange || AIM_RANGE) / (k || 1));
+    var pt = o.addScaledVector(d, this.aimReach());
     // Through the root's transform before projecting. The beam geometry is
     // built in model space and drawn as a child of root, so for the mini
     // instance — which is scaled down and parked over a card — the model
