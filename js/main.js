@@ -865,6 +865,7 @@
     // and is still well conditioned; 600 and up degenerate as the aim point
     // approaches the camera.
     mini.aimRange = 400;
+    mini.drone = false;   // the carousel canvas spans the strip, not a window
     if (!mini.init()) { layer.remove(); return; }
     mini.loadModel(src, function () { layer.remove(); });
 
@@ -882,7 +883,7 @@
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=20'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=21'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);

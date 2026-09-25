@@ -137,6 +137,34 @@
     return C.gear;
   }
 
+
+  /* Pixel-art quadcopter, drawn rather than downloaded: it costs no request,
+     stays crisp at any size, and carries no licence. Shown in place of the
+     pointer inside the viewer so the turret is visibly tracking a drone,
+     which is what the machine actually does. */
+  var DRONE_SVG =
+    '<svg viewBox="0 0 32 24" width="46" height="35" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">' +
+      '<g fill="#12161c">' +
+        '<rect x="2" y="5" width="9" height="2"/><rect x="21" y="5" width="9" height="2"/>' +
+        '<rect x="5" y="7" width="3" height="2"/><rect x="24" y="7" width="3" height="2"/>' +
+        '<rect x="8" y="9" width="4" height="2"/><rect x="20" y="9" width="4" height="2"/>' +
+        '<rect x="10" y="10" width="12" height="8"/>' +
+        '<rect x="9" y="18" width="3" height="2"/><rect x="20" y="18" width="3" height="2"/>' +
+        '<rect x="7" y="20" width="3" height="2"/><rect x="22" y="20" width="3" height="2"/>' +
+      '</g>' +
+      '<g fill="#3fc9dd">' +
+        '<rect x="3" y="5" width="3" height="1"/><rect x="7" y="5" width="3" height="1"/>' +
+        '<rect x="22" y="5" width="3" height="1"/><rect x="26" y="5" width="3" height="1"/>' +
+      '</g>' +
+      '<g fill="#6d7d94">' +
+        '<rect x="6" y="7" width="1" height="2"/><rect x="25" y="7" width="1" height="2"/>' +
+        '<rect x="11" y="11" width="10" height="6"/>' +
+        '<rect x="9" y="9" width="2" height="1"/><rect x="21" y="9" width="2" height="1"/>' +
+      '</g>' +
+      '<rect x="14" y="12" width="4" height="4" fill="#cfe9f7"/>' +
+      '<rect x="15" y="13" width="2" height="2" fill="#ffffff"/>' +
+    '</svg>';
+
   function TurretViewer(container) {
     this.container = container;
     this.scene = null; this.camera = null; this.renderer = null;
@@ -309,7 +337,28 @@
     // whole appeal of putting it there — tracking only inside its own box
     // means it freezes the moment you look away from it.
     if (!this.isTouch()) {
-      this.pointerListener = function (e) { self.pendingMove = { x: e.clientX, y: e.clientY }; };
+      if (this.drone !== false) {
+        this.droneEl = document.createElement('div');
+        this.droneEl.className = 'drone-cursor';
+        this.droneEl.innerHTML = DRONE_SVG;
+        this.container.appendChild(this.droneEl);
+        this.container.classList.add('hides-cursor');
+      }
+
+      this.pointerListener = function (e) {
+        self.pendingMove = { x: e.clientX, y: e.clientY };
+        if (!self.droneEl) return;
+        // Only stands in for the pointer while it is over the viewer. Outside
+        // it the turret still tracks, but the real cursor has other work.
+        var r = self.container.getBoundingClientRect();
+        var inside = e.clientX >= r.left && e.clientX <= r.right &&
+                     e.clientY >= r.top  && e.clientY <= r.bottom;
+        self.droneEl.style.opacity = inside ? '1' : '0';
+        if (inside) {
+          self.droneEl.style.transform =
+            'translate(' + (e.clientX - r.left) + 'px,' + (e.clientY - r.top) + 'px) translate(-50%,-50%)';
+        }
+      };
       document.addEventListener('pointermove', this.pointerListener);
     }
 

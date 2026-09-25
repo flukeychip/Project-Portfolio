@@ -1028,3 +1028,18 @@ nav {
     flex: 0 0 82vw;
   }
 }
+
+/* The drone stands in for the pointer inside the turret viewer, so the
+   machine is visibly tracking something rather than an invisible point. */
+.gallery-item-3d.hides-cursor { cursor: none; }
+
+.drone-cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 5;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
