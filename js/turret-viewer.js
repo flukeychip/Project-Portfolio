@@ -189,6 +189,7 @@
 
     this.resizeObserver = new ResizeObserver(function () {
       self.resize();
+      if (self.mini) self.layoutMini();
       if (self.visible && self.ready) self.renderer.render(self.scene, self.camera);
     });
     this.resizeObserver.observe(this.container);
@@ -216,9 +217,16 @@
     // ---- scene graph. Nesting is the entire reason a tilted yaw axis
     // works: the yaw axis is carried by the pitch joint, so parenting
     // payloadPivot inside carrierPivot makes that automatic.
+    // Everything the model is made of hangs off one root, so the whole
+    // machine can be scaled and moved as a unit. The mini instance in the
+    // carousel needs exactly that: a canvas spanning the whole strip, with
+    // the turret parked over one card and its beam free to run past it.
+    this.root = new THREE.Group();
+    this.scene.add(this.root);
+
     this.carrierPivot = new THREE.Group();
     this.carrierPivot.position.copy(this.WC);
-    this.scene.add(this.carrierPivot);
+    this.root.add(this.carrierPivot);
     this.payloadPivot = new THREE.Group();
     this.carrierPivot.add(this.payloadPivot);
 
@@ -232,12 +240,12 @@
     bg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
     this.beamLine = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: C.beam }));
     this.beamLine.frustumCulled = false;
-    this.scene.add(this.beamLine);
+    this.root.add(this.beamLine);
     this.beamDot = new THREE.Mesh(
       new THREE.SphereGeometry(6, 16, 12),
       new THREE.MeshBasicMaterial({ color: C.beam })
     );
-    this.scene.add(this.beamDot);
+    this.root.add(this.beamDot);
 
     // ---- fixed camera. High enough that both input bevels are visibly
     // meshing with the output gear, which is the whole point of looking at
@@ -266,10 +274,40 @@
       document.addEventListener('pointermove', this.pointerListener);
     }
 
+    if (this.mini) this.layoutMini();
+
     this.ready = true;
     this.apply(0, 0);
     if (this.visible && !this.animationId) this.animate();
     else this.renderer.render(this.scene, this.camera);
+  };
+
+  /* Park the model over a given element and shrink it, leaving the canvas
+     itself spanning the full strip so the beam is not clipped to the card.
+     The offset is derived by unprojecting the wanted screen point at the
+     wrist's own depth, so the wrist lands exactly there whatever the camera
+     is doing. */
+  TurretViewer.prototype.layoutMini = function () {
+    if (!this.mini || !this.root) return;
+    var host = document.querySelector(this.mini.anchor);
+    if (!host) return;
+    var hr = host.getBoundingClientRect();
+    var cr = this.container.getBoundingClientRect();
+    if (!cr.width || !cr.height || !hr.width) return;
+
+    var k = this.mini.scale || 0.55;
+    this.root.scale.setScalar(k);
+
+    var sx = hr.left + hr.width / 2;
+    var sy = hr.top + hr.height / 2;
+    var depth = this.WC.clone().project(this.camera).z;
+    var want = new THREE.Vector3(
+      (sx - cr.left) / cr.width * 2 - 1,
+      -((sy - cr.top) / cr.height * 2 - 1),
+      depth
+    ).unproject(this.camera);
+
+    this.root.position.copy(want.sub(this.WC.clone().multiplyScalar(k)));
   };
 
   TurretViewer.prototype.isTouch = function () {
@@ -336,7 +374,7 @@
 
     this.gearAPivot = new THREE.Group(); this.gearAPivot.position.copy(this.WC);
     this.gearBPivot = new THREE.Group(); this.gearBPivot.position.copy(this.WC);
-    this.scene.add(this.gearAPivot); this.scene.add(this.gearBPivot);
+    this.root.add(this.gearAPivot); this.root.add(this.gearBPivot);
 
     keys.forEach(function (r) {
       var tris = bodies[r];
@@ -347,7 +385,7 @@
       else {
         var m = meshFromTris(geo, classifyStatic(e));
         m.userData.ext = e;
-        self.scene.add(m);
+        self.root.add(m);
       }
     });
     this.foundGears = !!(gearA && gearB);
@@ -366,7 +404,7 @@
       if (thin && area > boardScore) { boardScore = area; boardKey = r; }
     });
     keys.forEach(function (r) {
-      self.scene.add(meshFromTris(collect(v, bodies[r]), r === boardKey ? C.board : C.part));
+      self.root.add(meshFromTris(collect(v, bodies[r]), r === boardKey ? C.board : C.part));
     });
   };
 

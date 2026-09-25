@@ -250,7 +250,49 @@ nav {
   scroll-margin-top: 80px;
 }
 
+/* The beam layer sits between the carousel's grey and the cards: above the
+   background so the laser is visible across the whole strip, below the cards
+   so it passes behind them. The section is already position:fixed with
+   overflow:hidden, which confines the beam to the strip, and the page
+   content above it is at a higher z-index, so it never reaches the white. */
+.carousel-beam {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* The turret card is a hole rather than a panel: the live model is drawn on
+   the beam layer behind it and shows through, so the laser can leave the
+   card. Only the info block keeps a background. */
+.carousel-card.card-turret {
+  background: transparent;
+  box-shadow: none;
+}
+
+.carousel-card.card-turret:hover {
+  transform: none;   /* the model lives on a separate layer and cannot follow */
+  box-shadow: none;
+}
+
+.carousel-card.card-turret .carousel-info {
+  background: var(--card-bg);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+/* Two classes, not one: .carousel-img sets background-color and is declared
+   later in this file, so a single-class rule loses on source order and the
+   grey panel paints straight over the canvas behind it. */
+.carousel-img.carousel-img-hole {
+  background: transparent;
+  background-color: transparent;
+  border-bottom: none;
+}
+
 .carousel-container {
+  position: relative;
+  z-index: 2;
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;

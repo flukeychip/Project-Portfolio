@@ -447,7 +447,7 @@
   normalizedProjects.forEach(function (p) {
     const card = document.createElement('a');
     card.href = '#' + p.id;
-    card.className = 'carousel-card';
+    card.className = 'carousel-card' + (p.turret && !isTouchDevice ? ' card-turret' : '');
 
     // Thumbnail priority: image → video (videos make great looping card previews)
     var thumb;
@@ -455,6 +455,20 @@
       thumb = '<img src="' + p.images[0] + '" alt="' + p.name + '" class="carousel-img">';
     } else if (p.videos && p.videos.length) {
       thumb = '<video src="' + p.videos[0] + '" class="carousel-img" autoplay loop muted playsinline></video>';
+    } else if (p.turret) {
+      // Left deliberately empty and transparent. On desktop the live model
+      // is drawn on a canvas behind the whole carousel, showing through this
+      // hole, so its beam can leave the card. On touch there is no cursor to
+      // track, so the tracking demo stands in.
+      if (isTouchDevice) {
+        var tl7 = p.timeline && p.timeline[6];
+        var t7 = typeof tl7 === 'string' ? tl7 : (tl7 && tl7.src);
+        thumb = t7
+          ? '<video src="' + t7 + '" class="carousel-img" autoplay loop muted playsinline></video>'
+          : '<div class="carousel-img carousel-img-hole"></div>';
+      } else {
+        thumb = '<div class="carousel-img carousel-img-hole"></div>';
+      }
     } else {
       thumb = '<div class="carousel-img" style="background: #f5f5f5; display: flex; align-items: center; justify-content: center; color: #999;">No photo</div>';
     }
@@ -676,7 +690,21 @@
     // fails to load, that 3D slot is removed and the viewer shows the next item.
     var mediaArray = [];
     if (p.turret) {
-      mediaArray.push({ type: 'turret', src: p.turret });
+      // A phone has no cursor, so a turret that tracks one is a still model
+      // and a wasted 7MB download. Step 7 of the build timeline is the
+      // tracking demo, which shows the same thing actually working.
+      if (isTouchDevice) {
+        var step7 = p.timeline && p.timeline[6];
+        var s7src = typeof step7 === 'string' ? step7 : (step7 && step7.src);
+        if (s7src) {
+          mediaArray.push({
+            type: /\.(mp4|webm|mov)(\?|$)/i.test(s7src) ? 'video' : 'image',
+            src: s7src
+          });
+        }
+      } else {
+        mediaArray.push({ type: 'turret', src: p.turret });
+      }
     }
     if (p.model) {
       mediaArray.push({ type: '3d', src: p.model });
@@ -801,11 +829,39 @@
     }
   });
 
+  // A second, smaller instance drawn behind the carousel cards. It shares
+  // the mesh file with the detail viewer, so the extra cost is a draw call,
+  // not another download.
+  function mountCarouselTurret(src) {
+    if (isTouchDevice) return;
+    var section = document.querySelector('.carousel-section');
+    var hole = document.querySelector('.card-turret .carousel-img-hole');
+    if (!section || !hole) return;
+
+    var layer = document.createElement('div');
+    layer.className = 'carousel-beam';
+    section.insertBefore(layer, section.firstChild);
+
+    var mini = new TurretViewer(layer);
+    mini.mini = { anchor: '.card-turret .carousel-img-hole', scale: 0.42 };
+    if (!mini.init()) { layer.remove(); return; }
+    mini.loadModel(src, function () { layer.remove(); });
+
+    // The strip scrolls horizontally and the hero slides over it, so where
+    // the model is parked has to be recomputed, not set once.
+    var relayout = function () { if (mini.ready) mini.layoutMini(); };
+    var cont = document.getElementById('carousel');
+    if (cont) cont.addEventListener('scroll', relayout, { passive: true });
+    window.addEventListener('scroll', relayout, { passive: true });
+    window.addEventListener('resize', relayout);
+    window.carouselTurret = mini;
+  }
+
   // The turret viewer needs Three.js but not GLTFLoader — its geometry
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=12'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=13'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
@@ -820,6 +876,7 @@
             tryDowngradeFromFailed3D(item.section, viewer);
           });
         });
+        mountCarouselTurret(pendingTurret[0].src);
       }
     );
   }
