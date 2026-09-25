@@ -48,6 +48,22 @@ const projects = [
     files: []
   },
   {
+    id: "6dof-arm",
+    name: "6-DOF Robot Arm",
+    tagline: "Six-degree-of-freedom articulated robot arm",
+    description: "This is the most in-depth project I have taken on. I was inspired by the Universal Robots UR3e arms in a campus design lab, but at $20,000 they were out of my price range, so I built my own. With parts on hand, about $100 from Amazon, and an old 3D printer, I built a six-degree-of-freedom arm: 3D printed 20:1 cycloidal drives, carbon fiber struts, belt driven remote actuation, magnetic Hall effect sensors, and a Jetson running it.</p><p>It is not perfect yet. The printed cycloidal drives do not hold tight enough tolerances, which shows up as backlash at the wrist, so the next set gets laser cut from aluminum. The magnetic sensors have a fixed I2C address, so every joint runs back through a multiplexer. Parts with configurable addresses would let them daisy chain and remove most of that wiring. The NEMA 17 steppers are near their limit on the heavier joints, so the base, shoulder and elbow move up to NEMA 23. It also needs an end effector: a force sensitive gripper that commands force instead of position.",
+    skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
+    model: null,
+    videos: [
+      "6dof%20arm/arm-demo-1.mp4"
+    ],
+    images: [],
+    timeline: [
+      { src: "6dof%20arm/Screenshot%202026-03-04%20224359.png", label: "CAD Design" }
+    ],
+    files: []
+  },
+  {
     id: "nfc-business-card",
     name: "NFC PCB Business Card",
     tagline: "Tap-to-open card with a custom NFC antenna",
@@ -65,22 +81,6 @@ const projects = [
     files: [
       { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/?s=web" }
     ]
-  },
-  {
-    id: "6dof-arm",
-    name: "6-DOF Robot Arm",
-    tagline: "Six-degree-of-freedom articulated robot arm",
-    description: "This is the most in-depth project I have taken on. I was inspired by the Universal Robots UR3e arms in a campus design lab, but at $20,000 they were out of my price range, so I built my own. With parts on hand, about $100 from Amazon, and an old 3D printer, I built a six-degree-of-freedom arm: 3D printed 20:1 cycloidal drives, carbon fiber struts, belt driven remote actuation, magnetic Hall effect sensors, and a Jetson running it.</p><p>It is not perfect yet. The printed cycloidal drives do not hold tight enough tolerances, which shows up as backlash at the wrist, so the next set gets laser cut from aluminum. The magnetic sensors have a fixed I2C address, so every joint runs back through a multiplexer. Parts with configurable addresses would let them daisy chain and remove most of that wiring. The NEMA 17 steppers are near their limit on the heavier joints, so the base, shoulder and elbow move up to NEMA 23. It also needs an end effector: a force sensitive gripper that commands force instead of position.",
-    skills: ["Stepper Control", "Kinematics", "3D Printing", "Computer Vision", "CAD"],
-    model: null,
-    videos: [
-      "6dof%20arm/arm-demo-1.mp4"
-    ],
-    images: [],
-    timeline: [
-      { src: "6dof%20arm/Screenshot%202026-03-04%20224359.png", label: "CAD Design" }
-    ],
-    files: []
   },
   {
     id: "ar-physics-simulation",
