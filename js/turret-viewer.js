@@ -448,11 +448,25 @@
     // |z| grabbed 265-triangle screws instead. Both sides must also resolve
     // to a substantial body, or nothing is animated at all — a lopsided
     // drivetrain is worse than a still one.
+    // The belt pulley on each side shares a shaft with its bevel, so it turns
+    // through the same angle rather than a ratio of it — the 60/26 is already
+    // spent getting from payload degrees to this shaft. Within the static
+    // group there is exactly one orange body per side, a disc coaxial with
+    // the bevel and just outboard of it, so the sign of its z centroid is
+    // enough to assign it. Both are driven even though only one faces the
+    // default camera: they hang off pivots that are already being rotated,
+    // so the far one costs nothing per frame and survives an orbit.
     var gearA = null, gearB = null, bestA = 0, bestB = 0;
+    var pulleyA = null, pulleyB = null;
     keys.forEach(function (r) {
       var e = extent(v, bodies[r]);
-      if (classifyStatic(e) !== C.gear) return;
+      var cls = classifyStatic(e);
       var cz = (e.z0 + e.z1) / 2;
+      if (cls === C.orange) {
+        if (cz > 0) pulleyA = r; else pulleyB = r;
+        return;
+      }
+      if (cls !== C.gear) return;
       if (Math.abs(cz) < 12) return;            // central pulley sits near z=0
       if (e.n < 5000) return;                   // screws and standoffs
       if (cz > 0 && e.n > bestA) { bestA = e.n; gearA = r; }
@@ -470,6 +484,8 @@
       var geo = collect(v, tris);
       if (r === gearA)      self.addPivotGroup(self.gearAPivot, geo, C.gear);
       else if (r === gearB) self.addPivotGroup(self.gearBPivot, geo, C.gear);
+      else if (r === pulleyA && gearA) self.addPivotGroup(self.gearAPivot, geo, C.orange);
+      else if (r === pulleyB && gearB) self.addPivotGroup(self.gearBPivot, geo, C.orange);
       else {
         var m = meshFromTris(geo, classifyStatic(e));
         m.userData.ext = e;
