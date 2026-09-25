@@ -238,9 +238,10 @@
     this.addPayload(d.groups.payload.v);
 
     /* ---- beam
-       A 1px line reads as a drawn vector, not light. A real beam has a
-       saturated core inside a soft halo, so this is three nested cylinders
-       at decreasing opacity.
+       A 1px line reads as a drawn vector, not light, so this is a thin
+       saturated core inside one faint glow. Kept deliberately restrained:
+       a thicker halo and a muzzle flare read as a special effect rather
+       than a laser.
 
        Deliberately NOT additive blending, which is the usual trick: the
        canvas is transparent over a near-white page, and additive over white
@@ -252,9 +253,8 @@
     this.root.add(this.beam);
 
     var layers = [
-      { r: 7.0, color: 0xa8ffc4, opacity: 0.14 },   // halo
-      { r: 2.6, color: 0x3dff7a, opacity: 0.38 },   // inner glow
-      { r: 0.8, color: C.beam,   opacity: 1.00 }    // core
+      { r: 1.6, color: 0x4dff88, opacity: 0.22 },   // faint glow
+      { r: 0.45, color: C.beam,  opacity: 1.00 }    // core
     ];
     this.beamLayers = layers.map(function (L) {
       var g = new THREE.CylinderGeometry(L.r, L.r, 1, 12, 1, true);
@@ -268,18 +268,9 @@
       return m;
     }, this);
 
-    // Muzzle glow, so the beam looks like it is coming out of the bore
-    // rather than starting in mid air.
-    this.muzzle = new THREE.Mesh(
-      new THREE.SphereGeometry(3.2, 12, 10),
-      new THREE.MeshBasicMaterial({ color: 0xd9ffe4, transparent: true, opacity: 0.85, depthWrite: false })
-    );
-    this.muzzle.renderOrder = 11;
-    this.root.add(this.muzzle);
-
     this.beamDot = new THREE.Mesh(
-      new THREE.SphereGeometry(5, 16, 12),
-      new THREE.MeshBasicMaterial({ color: C.beam, transparent: true, opacity: 0.9, depthWrite: false })
+      new THREE.SphereGeometry(2.4, 12, 10),
+      new THREE.MeshBasicMaterial({ color: C.beam, transparent: true, opacity: 0.85, depthWrite: false })
     );
     this.beamDot.renderOrder = 11;
     this.root.add(this.beamDot);
@@ -579,7 +570,6 @@
     this.beam.quaternion.setFromUnitVectors(UP_Y, dir);
     this.beam.scale.set(1, TARGET_RANGE, 1);
 
-    this.muzzle.position.copy(origin);
     this.beamDot.position.copy(end);
   };
 
