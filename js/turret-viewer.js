@@ -32,7 +32,10 @@
   // Part colours. Kept identical to the standalone sim so the two read as
   // the same machine.
   var C = {
-    white:    0xeef1f6,   // base plate, A/B frames, camera shells
+    // Wheat. These parts were 0xeef1f6, which is a shade off the page's own
+    // 0xFAFAFC background — on a transparent canvas they read as missing
+    // rather than white, and only the rim light hinted at their edges.
+    white:    0xd6b98c,   // base plate, A/B frames, camera shells
     motor:    0x6e757f,
     gear:     0x454b54,
     outGear:  0x8a93a3,
@@ -545,7 +548,8 @@
      the cursor. Two-level grid search, coarse then refined, which is a few
      hundred cheap projections per frame and cannot fail to converge or
      wander outside the travel limits the way an iterative solve can. */
-  var MAX_STEP_DEG = 12;    // per frame, keeps the head from teleporting
+  var MAX_STEP_DEG = 12;
+  var EASE         = 0.35;  // fraction of the remaining error taken per frame    // per frame, keeps the head from teleporting
   // mm along the beam, the point matched to the cursor. Measured, not
   // picked: at 500 the reachable points span ~5000px against a ~640px
   // canvas, so the cost surface is steep enough that the search walks to a
@@ -576,10 +580,17 @@
   TurretViewer.prototype.aimAtScreen = function (sx, sy, rect) {
     var self = this;
 
+    // A small preference for staying near the current pose. Where two poses
+    // put the beam equally close to the cursor, the solver would otherwise
+    // be free to alternate between them frame to frame, which is the
+    // residual wobble. At 0.3px per degree this only decides genuine ties.
+    var cp0 = this.state.pitch, cy0 = this.state.yaw;
     function score(p, y) {
       var s = self.beamPointOnScreen(p, y, rect);
       if (!s) return -1e9;
-      return -Math.hypot(s.x - sx, s.y - sy);        // closer is better
+      var d = Math.hypot(s.x - sx, s.y - sy);
+      var travel = Math.abs(p - cp0) + Math.abs(y - cy0);
+      return -(d + 0.3 * travel);
     }
 
     function refine(cp, cy, halfP, halfY) {
@@ -617,8 +628,17 @@
       if (g.a > res.a) res = g;
     }
 
-    var np = clamp(res.p, this.state.pitch - MAX_STEP_DEG, this.state.pitch + MAX_STEP_DEG);
-    var ny = clamp(res.y, this.state.yaw - MAX_STEP_DEG, this.state.yaw + MAX_STEP_DEG);
+    // Ease toward the solution instead of snapping to it. A first-order lag
+    // cannot overshoot, so the rate limiter can no longer set up a cycle of
+    // stepping past the target and back, and the head reads like something
+    // driven rather than teleported.
+    var tp = clamp(res.p, this.state.pitch - MAX_STEP_DEG, this.state.pitch + MAX_STEP_DEG);
+    var ty = clamp(res.y, this.state.yaw - MAX_STEP_DEG, this.state.yaw + MAX_STEP_DEG);
+    var np = this.state.pitch + (tp - this.state.pitch) * EASE;
+    var ny = this.state.yaw + (ty - this.state.yaw) * EASE;
+
+    // Deadband: below this the move is invisible and only costs a redraw.
+    if (Math.abs(np - this.state.pitch) < 0.02 && Math.abs(ny - this.state.yaw) < 0.02) return;
     this.apply(clamp(np, -PITCH_LIMIT, PITCH_LIMIT), clamp(ny, -90, 90));
   };
 
