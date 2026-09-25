@@ -198,10 +198,21 @@
     return true;
   };
 
+  /* One fetch per file, however many viewers want it. The detail viewer and
+     the carousel instance both use this mesh, and they were each pulling
+     7.7MB and parsing it separately — 15MB and two parses for one model.
+     build() only reads the data, so sharing the parsed object is safe. */
+  var meshRequests = {};
+
   TurretViewer.prototype.loadModel = function (src, onFailed) {
     var self = this;
-    fetch(src)
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    if (!meshRequests[src]) {
+      meshRequests[src] = fetch(src).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      });
+    }
+    meshRequests[src]
       .then(function (d) { self.build(d); })
       .catch(function () { if (onFailed) onFailed(); });
   };
@@ -555,8 +566,14 @@
     // two joints, and watching the two inputs turn together for pitch and
     // against each other for yaw is the clearest way to show it.
     if (this.gearAPivot) {
-      var a = N_DRIVE * (pitchDeg + yawDeg);
-      var b = N_DRIVE * (pitchDeg - yawDeg);
+      // Yaw is negated against the spec's a=N(pitch+yaw), b=N(pitch-yaw)
+      // because which physical frame is A is decided here by the sign of a
+      // body's z centroid, and that came out opposite to the real machine.
+      // Pitch is the sum so it reads correctly either way; yaw is the
+      // difference, so getting the sides backwards inverts it — which is
+      // exactly how it looked on the bench.
+      var a = N_DRIVE * (pitchDeg - yawDeg);
+      var b = N_DRIVE * (pitchDeg + yawDeg);
       this.gearAPivot.quaternion.setFromAxisAngle(this.PITCH_AXIS, degToRad(a) + this.PITCH_OFFSET);
       this.gearBPivot.quaternion.setFromAxisAngle(this.PITCH_AXIS, degToRad(b) + this.PITCH_OFFSET);
     }

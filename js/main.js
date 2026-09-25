@@ -103,6 +103,21 @@
   }
 
   // ── 3D Script Loader ───────────────────────────────────────
+  // Heavy media is only worth fetching once its section is in reach. The
+  // engraver model is 6.9MB and the turret mesh 7.7MB, both for projects
+  // well below the fold, and they were being pulled on first paint.
+  function whenNear(el, cb) {
+    if (!el || !('IntersectionObserver' in window)) { cb(); return; }
+    var fired = false;
+    var io = new IntersectionObserver(function (entries) {
+      if (fired || !entries[0].isIntersecting) return;
+      fired = true;
+      io.disconnect();
+      cb();
+    }, { rootMargin: '150% 0px' });
+    io.observe(el);
+  }
+
   function loadScriptsSequential(urls, callback) {
     function loadNext(i) {
       if (i >= urls.length) { callback(); return; }
@@ -867,7 +882,7 @@
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=18'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=20'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
@@ -878,8 +893,10 @@
             return;
           }
           item.section.viewer3d = viewer;
-          viewer.loadModel(item.src, function () {
-            tryDowngradeFromFailed3D(item.section, viewer);
+          whenNear(item.section, function () {
+            viewer.loadModel(item.src, function () {
+              tryDowngradeFromFailed3D(item.section, viewer);
+            });
           });
         });
         mountCarouselTurret(pendingTurret[0].src);
@@ -900,8 +917,10 @@
             return;
           }
           item.section.viewer3d = viewer;
-          viewer.loadModel(item.src, function () {
-            tryDowngradeFromFailed3D(item.section, viewer);
+          whenNear(item.section, function () {
+            viewer.loadModel(item.src, function () {
+              tryDowngradeFromFailed3D(item.section, viewer);
+            });
           });
         });
       }

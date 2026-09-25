@@ -14,7 +14,8 @@ param(
     "scripts",
     "staging",
     "node_modules",
-    "nfc-card"
+    "nfc-card",
+    "_archive"
   )
 )
 
@@ -64,7 +65,10 @@ if ($foldersToSync.Count -eq 0) {
 
 foreach ($folder in $foldersToSync) {
   $destination = Join-Path -Path $targetPath -ChildPath $folder.Name
-  $null = robocopy $folder.FullName $destination /MIR /R:2 /W:1 /NFL /NDL /NJH /NJS /NP
+  # Raw camera files and CAD archives stay local: the site references the
+  # re-encoded .mp4 versions, and these were 376MB of the published mirror.
+  $excludeFiles = @("*.mov", "*.MOV", "*.f3z", "*.3mf", "Short Gif.gif")
+  $null = robocopy $folder.FullName $destination /MIR /R:2 /W:1 /NFL /NDL /NJH /NJS /NP /XF $excludeFiles
   if ($LASTEXITCODE -gt 7) {
     throw "Robocopy failed for '$($folder.Name)' with exit code $LASTEXITCODE"
   }

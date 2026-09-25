@@ -20,3 +20,8 @@ CONTEXT.md
 !/lib/
 !/public/
 !/scripts/
+
+# Unused published material, moved out of assets/ so it is not on GitHub.
+# Kept locally for context. The originals also still live in the root
+# project folders, which are ignored too.
+_archive/
