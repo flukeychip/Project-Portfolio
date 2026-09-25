@@ -26,6 +26,28 @@
 
 const projects = [
   {
+    id: "laser-turret",
+    name: "Vision-Guided Laser Turret",
+    tagline: "Autonomous drone detection, classification, and tracking",
+    description: "My university was hosting a competition where teams would design a project in a limited time frame that incorporated AI and hardware. I had always had this as a project in the back of my mind and I finally got the chance to build and show it off. We started by brainstorming and came up with key points we needed our system to have. Above all, it is meant to protect humans and living beings, so it was designed from the ground up with safety in mind.</p><p>Additionally, we wanted to make the most of the technology we had available to us. So we used computer vision and a custom data set with over 3,600 images, including a thousand negatives to inhibit the system from identifying someone's water bottle or phone as a false positive. We then integrated sensors to give real-time feedback and allow for complete autonomy.</p><p>The turret itself features a robotic wrist differential, which allows the payload to be remotely actuated without adding unnecessary weight. On the payload, there are wide and narrow FOV cameras to detect threats from a variety of distances. Additionally, it contains a 9-axis IMU to allow for contactless homing and to seamlessly fuse the sensor data with the (time stamped) motor commands and computer vision data. Then, there is a 5 mW laser (for demonstration purposes) mounted to the payload that is switched on or off by the perception / classification stack.</p><p>In 3 weeks, my team had a finished prototype, and we spent the next few days fine tuning it before the competition. We then received an email saying we made finalists for the competition and were invited to demonstrate it in front of industry leaders from Oracle, Micron and Nvidia, where we took second place.",
+    skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision", "Machine Learning"],
+    model: null,
+    videos: [
+      "Laser%20Turret/turret-demo-1.mp4",
+      "Laser%20Turret/turret-demo-2.mp4"
+    ],
+    images: [
+      "Laser%20Turret/turret-laser.jpg",
+      "Laser%20Turret/turret-front.jpg",
+      "Laser%20Turret/turret-pitched.jpg",
+      "Laser%20Turret/turret-differential.jpg",
+      "Laser%20Turret/turret-controller-board.jpg",
+      "Laser%20Turret/turret-bench.jpg"
+    ],
+    timeline: [],
+    files: []
+  },
+  {
     id: "nfc-business-card",
     name: "NFC PCB Business Card",
     tagline: "Tap-to-open card with a custom NFC antenna",
@@ -43,28 +65,6 @@ const projects = [
     files: [
       { name: "Live landing page", url: "https://flukeychip.github.io/nfc-business-card/?s=web" }
     ]
-  },
-  {
-    id: "laser-turret",
-    name: "Vision-Guided Laser Turret",
-    tagline: "Autonomous drone detection, classification, and tracking",
-    description: "I built this for the Purdue Institute of Chips and AI Hackathon showcase on September 22nd. Of the 49 teams that entered, 9 made the finals and we took second. It is a turret that spots a drone and keeps a laser tracking it as it moves. It is demoed in a room full of people, so tracking never stops but the laser cuts out before the beam gets near anyone. I designed the controller board in KiCad as a carrier for a Pico and two A4988 drivers, with the buck regulator on board, and populated it myself. The 9-axis IMU rides on the payload, not the base. The motion platform is a bevel gear differential wrist printed in SLS nylon and PLA, with both steppers mounted off the moving assembly and driving it through belts, so the only mass that has to move is the optics.</p><p>Getting the board working taught me the most. Both motors buzzed and both drivers ran hot, which looked like a firmware bug until I traced the pinout on the copper and found the motor cable splitting each coil across the wrong pins. One driver also had its step and direction pins mislabeled in the schematic, so the firmware now rebuilds its pin map from the board and refuses to flash if the two disagree. The hardware is all finished now.</p><p>The perception side is finished too. We fine tuned an Ultralytics YOLO11 model on about 3,600 images we collected ourselves. Every public drone dataset is shot from below with the drone in flight, and we are demoing indoors where we cannot fly it, so a model trained on those images would be looking for something it is never going to see. Ours is trained on a drone held in someone's hand, at the ranges and angles the demo actually happens at. About a thousand of those images are negatives, us holding phones and water bottles. That is what the room is actually full of, and I would rather the turret ignore them than lock onto one.",
-    skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision", "Machine Learning"],
-    model: null,
-    videos: [
-      "Laser%20Turret/turret-demo-1.mp4",
-      "Laser%20Turret/turret-demo-2.mp4"
-    ],
-    images: [
-      "Laser%20Turret/turret-laser.jpg",
-      "Laser%20Turret/turret-front.jpg",
-      "Laser%20Turret/turret-pitched.jpg",
-      "Laser%20Turret/turret-differential.jpg",
-      "Laser%20Turret/turret-controller-board.jpg",
-      "Laser%20Turret/turret-bench.jpg"
-    ],
-    timeline: [],
-    files: []
   },
   {
     id: "6dof-arm",
