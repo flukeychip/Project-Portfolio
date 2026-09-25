@@ -137,7 +137,7 @@ const projects = [
     id: "buck-5v",
     name: "Low Cost Switching Power Supply",
     tagline: "Custom switching power supply PCB",
-    description: "This was my first time soldering SMD components, and I knew that this project was just a test bench. It taught me the process and allowed me to incorporate it into other designs.",
+    description: "This was my first time soldering SMD components, and I knew that this project was just a test bench. It taught me the process and allowed me to incorporate it into other designs.</p><p>Looking at it now, there are things I would change. There is a continuous ground plane, so the return path under the switching loop is mostly tight, but the plane is broken in one place and the switch node is larger than it needs to be. Those are the first two things I would fix if I respun it.",
     skills: ["PCB Design", "Autodesk Eagle", "Power Electronics", "Switching Regulators"],
     model: null,
     images: [
