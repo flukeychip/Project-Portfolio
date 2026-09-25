@@ -20,6 +20,7 @@
   'use strict';
 
   var V = function (x, y, z) { return new THREE.Vector3(x, y, z); };
+  var UP_Y;   // set once THREE exists
   function degToRad(d) { return d * Math.PI / 180; }
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
@@ -42,7 +43,7 @@
     orange:   0xd98a3a,   // end caps, carrier, rear plate, faceplate
     silk:     0x2f6fd0,
     ic:       0x15181d,
-    beam:     0x3ddc84,
+    beam:     0x14e05c,   // 532nm green, saturated enough to read on a light page
     board:    0x1f6b3b,   // the controller PCB
     part:     0x22262c    // through-hole components on it
   };
@@ -160,6 +161,7 @@
 
   TurretViewer.prototype.init = function () {
     if (typeof THREE === 'undefined') return false;
+    if (!UP_Y) UP_Y = new THREE.Vector3(0, 1, 0);
     try {
       this.scene = new THREE.Scene();          // no background: stays transparent
       this.camera = new THREE.PerspectiveCamera(42, 1, 1, 12000);
@@ -235,16 +237,51 @@
     this.addPivotGroup(this.carrierPivot, d.groups.carrier.v, C.orange);
     this.addPayload(d.groups.payload.v);
 
-    // ---- beam
-    var bg = new THREE.BufferGeometry();
-    bg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
-    this.beamLine = new THREE.Line(bg, new THREE.LineBasicMaterial({ color: C.beam }));
-    this.beamLine.frustumCulled = false;
-    this.root.add(this.beamLine);
-    this.beamDot = new THREE.Mesh(
-      new THREE.SphereGeometry(6, 16, 12),
-      new THREE.MeshBasicMaterial({ color: C.beam })
+    /* ---- beam
+       A 1px line reads as a drawn vector, not light. A real beam has a
+       saturated core inside a soft halo, so this is three nested cylinders
+       at decreasing opacity.
+
+       Deliberately NOT additive blending, which is the usual trick: the
+       canvas is transparent over a near-white page, and additive over white
+       saturates to white, so the laser would disappear exactly where it is
+       supposed to be brightest. Normal blending with a strongly saturated
+       green is what survives a light background. */
+    this.beam = new THREE.Group();
+    this.beam.renderOrder = 10;
+    this.root.add(this.beam);
+
+    var layers = [
+      { r: 7.0, color: 0xa8ffc4, opacity: 0.14 },   // halo
+      { r: 2.6, color: 0x3dff7a, opacity: 0.38 },   // inner glow
+      { r: 0.8, color: C.beam,   opacity: 1.00 }    // core
+    ];
+    this.beamLayers = layers.map(function (L) {
+      var g = new THREE.CylinderGeometry(L.r, L.r, 1, 12, 1, true);
+      g.translate(0, 0.5, 0);                        // grow from the bore end
+      var m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({
+        color: L.color, transparent: true, opacity: L.opacity,
+        depthWrite: false, side: THREE.DoubleSide
+      }));
+      m.frustumCulled = false;
+      this.beam.add(m);
+      return m;
+    }, this);
+
+    // Muzzle glow, so the beam looks like it is coming out of the bore
+    // rather than starting in mid air.
+    this.muzzle = new THREE.Mesh(
+      new THREE.SphereGeometry(3.2, 12, 10),
+      new THREE.MeshBasicMaterial({ color: 0xd9ffe4, transparent: true, opacity: 0.85, depthWrite: false })
     );
+    this.muzzle.renderOrder = 11;
+    this.root.add(this.muzzle);
+
+    this.beamDot = new THREE.Mesh(
+      new THREE.SphereGeometry(5, 16, 12),
+      new THREE.MeshBasicMaterial({ color: C.beam, transparent: true, opacity: 0.9, depthWrite: false })
+    );
+    this.beamDot.renderOrder = 11;
     this.root.add(this.beamDot);
 
     // ---- fixed camera. High enough that both input bevels are visibly
@@ -308,6 +345,7 @@
     ).unproject(this.camera);
 
     this.root.position.copy(want.sub(this.WC.clone().multiplyScalar(k)));
+    this.root.updateMatrixWorld();
   };
 
   TurretViewer.prototype.isTouch = function () {
@@ -535,10 +573,13 @@
     var origin = this.laserOrigin(pitchDeg, yawDeg);
     var dir = this.forward(pitchDeg, yawDeg);
     var end = origin.clone().addScaledVector(dir, TARGET_RANGE);
-    var pos = this.beamLine.geometry.attributes.position;
-    pos.setXYZ(0, origin.x, origin.y, origin.z);
-    pos.setXYZ(1, end.x, end.y, end.z);
-    pos.needsUpdate = true;
+
+    // Cylinders are built along +Y, so rotate that onto the beam and stretch.
+    this.beam.position.copy(origin);
+    this.beam.quaternion.setFromUnitVectors(UP_Y, dir);
+    this.beam.scale.set(1, TARGET_RANGE, 1);
+
+    this.muzzle.position.copy(origin);
     this.beamDot.position.copy(end);
   };
 
@@ -606,7 +647,18 @@
   TurretViewer.prototype.beamPointOnScreen = function (pitchDeg, yawDeg, rect) {
     var o = this.laserOrigin(pitchDeg, yawDeg);
     var d = this.forward(pitchDeg, yawDeg);
-    var pt = o.addScaledVector(d, AIM_RANGE);
+    // Divided by the root scale so the aim point sweeps the same span in
+    // pixels whatever size the model is drawn at. The mini instance is at
+    // 0.42, and without this it can only reach 42% as far across the screen
+    // before saturating, which looks like the beam refusing to follow.
+    var k = this.root ? this.root.scale.x : 1;
+    var pt = o.addScaledVector(d, (this.aimRange || AIM_RANGE) / (k || 1));
+    // Through the root's transform before projecting. The beam geometry is
+    // built in model space and drawn as a child of root, so for the mini
+    // instance — which is scaled down and parked over a card — the model
+    // point and the point actually on screen are different places. Solving
+    // against the untransformed one aims at nothing.
+    if (this.root) { this.root.updateMatrixWorld(); this.root.localToWorld(pt); }
     pt.project(this.camera);
     if (pt.z > 1 || pt.z < -1) return null;          // behind the camera
     return {

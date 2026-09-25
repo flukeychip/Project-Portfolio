@@ -844,6 +844,12 @@
 
     var mini = new TurretViewer(layer);
     mini.mini = { anchor: '.card-turret .carousel-img-hole', scale: 0.42 };
+    // Longer lever than the detail viewer. Parked at the left of the strip,
+    // 250 only reaches x=476 of a 716px band, so the beam saturates before
+    // the cursor gets to the right-hand cards. 400 reaches past both edges
+    // and is still well conditioned; 600 and up degenerate as the aim point
+    // approaches the camera.
+    mini.aimRange = 400;
     if (!mini.init()) { layer.remove(); return; }
     mini.loadModel(src, function () { layer.remove(); });
 
@@ -861,7 +867,7 @@
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=13'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=17'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
