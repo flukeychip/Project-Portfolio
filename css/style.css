@@ -842,11 +842,10 @@ nav {
   margin-bottom: 1.5rem;
 }
 
+/* No box. The background here was the same colour as the page, so the
+   accent bar was the only thing suggesting a container — decoration around
+   nothing. The list now sits flush with the paragraph above it. */
 .about-box {
-  background: var(--bg-color);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border-left: 4px solid var(--accent);
   margin-bottom: 2.5rem;
 }
 
