@@ -7,7 +7,10 @@
   --card-bg: #FFFFFF;
   --dark-block: #222222;
   --border: #EAEAEA;
-  --font: Helvetica, Arial, sans-serif;
+  /* Helvetica Neue on macOS and iOS, plain Helvetica where that is what
+     exists, Arial on Windows — which has no Helvetica and ships Arial as
+     its metric-compatible substitute, so the layout does not shift. */
+  --font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --ease: 0.3s ease;
 }
@@ -785,7 +788,7 @@ nav {
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.4);
   white-space: nowrap;
