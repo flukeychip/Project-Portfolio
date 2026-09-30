@@ -44,6 +44,7 @@
     return Object.assign({}, project, {
       model: toAssetPath(project.model),
       turret: toAssetPath(project.turret),
+      cardImage: toAssetPath(project.cardImage),
       images: (project.images || []).map(toAssetPath),
       videos: (project.videos || []).map(toAssetPath),
       files: (project.files || []).map(function (file) {
@@ -462,11 +463,16 @@
   normalizedProjects.forEach(function (p) {
     const card = document.createElement('a');
     card.href = '#' + p.id;
-    card.className = 'carousel-card' + (p.turret && !isTouchDevice ? ' card-turret' : '');
+    card.className = 'carousel-card' +
+      (p.turret && !p.cardImage && !isTouchDevice ? ' card-turret' : '');
 
-    // Thumbnail priority: image → video (videos make great looping card previews)
+    // Thumbnail priority: cardImage → image → video (videos make great
+    // looping card previews). cardImage exists so a project can show one
+    // thing on its card and another in its detail section.
     var thumb;
-    if (p.images && p.images.length) {
+    if (p.cardImage) {
+      thumb = '<img src="' + p.cardImage + '" alt="' + p.name + '" class="carousel-img">';
+    } else if (p.images && p.images.length) {
       thumb = '<img src="' + p.images[0] + '" alt="' + p.name + '" class="carousel-img">';
     } else if (p.videos && p.videos.length) {
       thumb = '<video src="' + p.videos[0] + '" class="carousel-img" autoplay loop muted playsinline></video>';

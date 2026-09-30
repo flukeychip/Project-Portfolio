@@ -3,7 +3,12 @@
   --bg-color: #FAFAFC;
   --text-main: #111111;
   --text-muted: #666666;
-  --accent: #0F4C81;
+  /* The orange the printed parts actually come out in is #D98A3A (the same
+     value the turret viewer renders them in), but that is only 2.6:1 on this
+     background — too weak to carry text, and too weak to hold white text on a
+     button fill. This is the same hue driven down to 5.4:1, so all seven
+     existing uses of --accent keep their contrast without being rethought. */
+  --accent: #A0520C;
   --card-bg: #FFFFFF;
   --dark-block: #222222;
   --border: #EAEAEA;
@@ -335,11 +340,74 @@ nav {
   flex: 0 0 350px;
   display: flex;
   flex-direction: column;
+  position: relative;   /* anchors the hover wave below */
 }
 
 .carousel-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover affordance.
+   The 8px lift on its own is easy to miss, so a soft orange wave also swells
+   up from the bottom edge on hover.
+
+   Shape: a circle 5x the card's width, parked one full diameter below the
+   card. Only the very crown of such a large circle enters the frame, so what
+   you see is a shallow wave that spans the whole card — about 22px deep at
+   the centre and 6px at the corners — rather than an obvious bubble rising in
+   the middle. The card's own overflow:hidden trims it to the rounded corners.
+
+   Travel: 18px, and that number is measured, not chosen. Every card is the
+   same height, but taglines run one to three lines, so the free space under
+   the last line of text varies. The tightest card in the set (ESP32 Dev Board
+   Testbench, a three-line tagline) leaves 24px, and the 3px blur below puts
+   the soft edge of the wave 3px above its geometric crest — so 18 + 3 = 21px
+   used, 3px to spare, on the worst card rather than the roomy ones. If a
+   future tagline wraps to four lines, this needs remeasuring.
+
+   Colour: the filament orange #D98A3A, not --accent. --accent had to be driven
+   darker to stay legible; nothing is legible on top of this, so the brighter,
+   truer orange is free to be used here. */
+.carousel-card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 500%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: rgba(217, 138, 58, 0.45);
+  filter: blur(3px);
+  transform: translate(-50%, 100%);
+  transition: transform 0.5s cubic-bezier(0.22, 0.75, 0.3, 1), opacity 0.5s;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.carousel-card:hover::after {
+  transform: translate(-50%, calc(100% - 18px));
+  opacity: 1;
+}
+
+/* The wave is a sibling of the image and the text, so both are lifted above
+   it — otherwise the dome paints over the photo's bottom edge. */
+.carousel-card .carousel-img,
+.carousel-card .carousel-info {
+  position: relative;
+  z-index: 1;
+}
+
+/* The info block sits over the wave, so it cannot carry its own opaque
+   background or it hides the thing entirely. The card behind it is already
+   --card-bg, so nothing changes visually when the wave is down. */
+.carousel-card .carousel-info {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel-card::after { transition: none; }
 }
 
 .carousel-img {

@@ -33,7 +33,17 @@ const projects = [
     skills: ["PCB Design", "KiCad", "Embedded Firmware", "Motion Control", "Computer Vision", "Machine Learning"],
     model: null,
     turret: "Laser%20Turret/wrist_mesh.json",
-    videos: [],
+    // Carousel thumbnail ONLY. The detail section still leads with the live
+    // 3D viewer — this is deliberately not in `images`, because anything in
+    // there becomes a slide in the detail gallery too. Setting it also
+    // switches the card from the transparent hole to a normal panel, so
+    // deleting this one line restores the model-behind-the-carousel look.
+    cardImage: "Laser%20Turret/turret-demo-station.jpg",
+    // Detail gallery slide 2. Gallery order is turret -> model -> videos ->
+    // images, so this lands right after the 3D viewer. demo-2 rather than
+    // demo-1 because touch devices swap the 3D slot for timeline step 7,
+    // which IS demo-1 — picking it here would play the same clip twice.
+    videos: ["Laser%20Turret/turret-demo-2.mp4"],
     images: [],
     timeline: [
       { src: "Laser%20Turret/turret-controller-board.jpg", label: "Controller Board"   },
