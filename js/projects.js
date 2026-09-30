@@ -43,7 +43,8 @@ const projects = [
       { src: "Laser%20Turret/turret-bench.jpg",            label: "Bench Testing"      },
       { src: "Laser%20Turret/turret-laser.jpg",            label: "Laser Mounted"      },
       { src: "Laser%20Turret/turret-demo-1.mp4",           label: "Tracking Demo"      },
-      { src: "Laser%20Turret/turret-demo-2.mp4",           label: "Laser Tracking"     }
+      { src: "Laser%20Turret/turret-demo-2.mp4",           label: "Laser Tracking"     },
+      { src: "Laser%20Turret/turret-team-certificates.jpg", label: "Second Place"      }
     ],
     files: []
   },
