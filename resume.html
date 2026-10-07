@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alexander Arens &mdash; Resume</title>
+<meta name="robots" content="noindex">
+
+<!-- A counted door in front of the resume PDF.
+     The click handler in index.html only sees people who were already on the
+     site. A PDF cannot run JavaScript, so anyone opening the file URL straight
+     from a printed resume, a search result or a forwarded link is invisible in
+     the stats. This page fires the beacon, then forwards to the same file.
+     Put THIS url on future resumes and cards; the PDF path keeps working
+     unchanged for every copy already in circulation. -->
+
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       background:#FAFAFC;color:#111;
+       font:16px/1.6 'Helvetica Neue',Helvetica,Arial,sans-serif}
+  a{color:#A0520C}
+</style>
+</head>
+<body>
+<p>Opening the resume&hellip; <a id="fallback" href="assets/Misc/Alexander_Arens_resume.pdf?v=20261006">download it directly</a>.</p>
+
+<noscript>
+  <meta http-equiv="refresh" content="0; url=assets/Misc/Alexander_Arens_resume.pdf?v=20261006">
+</noscript>
+
+<script>
+(function () {
+  var PDF = 'assets/Misc/Alexander_Arens_resume.pdf?v=20261006';
+  var COUNTER_CODE = 'flukeychip';
+
+  function go() { location.replace(PDF); }
+
+  // Same two guards as index.html: never count local previews, and honour the
+  // per-browser opt-out set by #toggle-goatcounter.
+  var skip = false;
+  try { skip = localStorage.getItem('skipgc') === '1'; } catch (e) {}
+  if (location.hostname !== 'flukeychip.github.io' || skip) { go(); return; }
+
+  // The beacon is fire-and-forget, but navigating away in the same tick can
+  // cancel it before it leaves. So wait for the request to settle - and cap
+  // that wait at 600ms, because counting a visit is never worth making the
+  // person stare at a blank page.
+  var done = false;
+  function once() { if (!done) { done = true; go(); } }
+
+  try {
+    var img = new Image();
+    img.onload = once;
+    img.onerror = once;
+    img.src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
+      + '?p=' + encodeURIComponent('/portfolio/resume-direct')
+      + '&t=' + encodeURIComponent('Resume opened directly')
+      + '&r=' + encodeURIComponent(document.referrer || '');
+  } catch (e) { once(); return; }
+
+  setTimeout(once, 600);
+})();
+</script>
+</body>
+</html>
