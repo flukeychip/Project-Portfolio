@@ -48,6 +48,17 @@
   var done = false;
   function once() { if (!done) { done = true; go(); } }
 
+  // Same coarse signals as index.html: screen size, any ?src= tag on the
+  // printed link, and GoatCounter's bot class 153 for automated browsers that
+  // set navigator.webdriver. No identifier is built from any of it.
+  var extra = '';
+  try {
+    extra += '&s=' + encodeURIComponent([screen.width, screen.height,
+                                         window.devicePixelRatio || 1].join(','));
+  } catch (e) {}
+  if (location.search) extra += '&q=' + encodeURIComponent(location.search.slice(1));
+  try { if (navigator.webdriver === true) extra += '&b=153'; } catch (e) {}
+
   try {
     var img = new Image();
     img.onload = once;
@@ -55,7 +66,8 @@
     img.src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
       + '?p=' + encodeURIComponent('/portfolio/resume-direct')
       + '&t=' + encodeURIComponent('Resume opened directly')
-      + '&r=' + encodeURIComponent(document.referrer || '');
+      + '&r=' + encodeURIComponent(document.referrer || '')
+      + extra;
   } catch (e) { once(); return; }
 
   setTimeout(once, 600);

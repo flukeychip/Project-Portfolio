@@ -164,18 +164,81 @@
         }
       }
 
+      // Headless and automated browsers set navigator.webdriver. GoatCounter
+      // takes a bot class in `b` from its isbot library, where 153 is
+      // "generic WebDriver-based headless browser", and keeps those out of the
+      // visitor figures instead of letting them quietly inflate the numbers.
+      // This is the honest answer to "was that a person or an agent".
+      var BOT = false;
+      try { BOT = navigator.webdriver === true; } catch (e) {}
+
+      // Screen size, as GoatCounter wants it: width,height,scale.
+      var SCREEN = '';
+      try {
+        SCREEN = [screen.width, screen.height, window.devicePixelRatio || 1].join(',');
+      } catch (e) {}
+
       function hit(path, title) {
         if (skipped()) return;
         try {
-          new Image().src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
+          var u = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
             + '?p=' + encodeURIComponent(path)
             + '&t=' + encodeURIComponent(title)
             + '&r=' + encodeURIComponent(document.referrer || '');
+          if (SCREEN) u += '&s=' + encodeURIComponent(SCREEN);
+          // Campaign/source tagging: ?src=resume on a printed link shows up
+          // here instead of being thrown away.
+          if (location.search) u += '&q=' + encodeURIComponent(location.search.slice(1));
+          if (BOT) u += '&b=153';
+          new Image().src = u;
         } catch (e) {}
+      }
+
+      // Where the visitor actually is, as opposed to where their IP exits.
+      // GoatCounter locates by IP, and a VPN or a corporate egress moves that
+      // across the world while leaving the machine's own clock and language
+      // alone -- so an IP in one country reporting a timezone in another is a
+      // tunnel, not a traveller.
+      //
+      // Deliberately NOT a fingerprint: both values are recorded as their own
+      // bucket and counted, never combined into an identifier for a person.
+      // Nothing is stored on the device and nothing is correlatable off this
+      // site, so the no-consent-banner position above still holds.
+      function meta() {
+        var tz = '', lang = '';
+        try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+        try { lang = navigator.language || ''; } catch (e) {}
+        var clean = function (v) { return String(v).replace(/[^A-Za-z0-9_-]+/g, '-'); };
+        if (tz || lang) {
+          hit('/meta/' + clean(tz || 'unknown') + '/' + clean(lang || 'unknown'),
+              'Timezone / language');
+        }
       }
 
       addEventListener('load', function () {
         hit('/portfolio', 'Portfolio');
+        meta();
+
+        // A loader that leaves immediately and a person who reads for a minute
+        // are the same single pageview otherwise. Count 30 seconds of actually
+        // VISIBLE time -- the Page Visibility API means a tab left open in the
+        // background behind other work does not quietly earn credit.
+        try {
+          var visible = 0, since = document.hidden ? 0 : Date.now(), timer = null;
+          var tick = function () {
+            if (!document.hidden && since) visible += Date.now() - since;
+            since = document.hidden ? 0 : Date.now();
+            if (visible >= 30000) {
+              hit('/portfolio/read', 'Read 30s+');
+              // Fires once. Stop the timer rather than leaving it spinning for
+              // the life of the page just to hit an early return.
+              clearInterval(timer);
+              document.removeEventListener('visibilitychange', tick);
+            }
+          };
+          document.addEventListener('visibilitychange', tick);
+          timer = setInterval(tick, 5000);
+        } catch (e) {}
 
         // This is a single page, so one landing pageview says nothing about
         // what actually held someone's attention. Count a project the first
