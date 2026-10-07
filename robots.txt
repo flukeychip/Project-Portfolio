@@ -1,3 +1,9 @@
+# NOTE: this file is NOT read by crawlers. robots.txt is only honoured at
+# the domain root, and this site is served from a /Project-Portfolio/ sub
+# path. The rules that actually apply live in the flukeychip.github.io
+# repo, which serves https://flukeychip.github.io/robots.txt. Keep the two
+# in step, or delete this one.
+
 User-agent: *
 Allow: /
 Disallow: /assets/Misc/me.png
