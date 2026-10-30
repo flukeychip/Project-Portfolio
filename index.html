@@ -219,19 +219,42 @@
         hit('/portfolio', 'Portfolio');
         meta();
 
-        // A loader that leaves immediately and a person who reads for a minute
-        // are the same single pageview otherwise. Count 30 seconds of actually
-        // VISIBLE time -- the Page Visibility API means a tab left open in the
-        // background behind other work does not quietly earn credit.
+        // Dwell time, as a ladder of milestones rather than a single flag.
+        //
+        // Only VISIBLE time counts -- the Page Visibility API means a tab left
+        // open in the background behind other work earns nothing, which is the
+        // difference between "read for four minutes" and "forgot to close it".
+        //
+        // Each rung fires once, as it is crossed, while the page is still open.
+        // Reporting one final bucket on the way out would be tidier, but unload
+        // is precisely when a browser is least willing to let a request leave,
+        // so the tidier version is the one that loses data.
+        //
+        // The rungs are cumulative by nature: a four minute visit trips 30s, 1m
+        // and 2m on its way past. So read them as a funnel -- the drop-off from
+        // one rung to the next IS the distribution of how long people stay.
         try {
-          var visible = 0, since = document.hidden ? 0 : Date.now(), timer = null;
+          var RUNGS = [
+            [ 30000, '/portfolio/read/30s', 'Read 30s'],
+            [ 60000, '/portfolio/read/1m',  'Read 1m' ],
+            [120000, '/portfolio/read/2m',  'Read 2m' ],
+            [300000, '/portfolio/read/5m',  'Read 5m' ],
+            [600000, '/portfolio/read/10m', 'Read 10m']
+          ];
+          var visible = 0, since = document.hidden ? 0 : Date.now();
+          var rung = 0, timer = null;
           var tick = function () {
             if (!document.hidden && since) visible += Date.now() - since;
             since = document.hidden ? 0 : Date.now();
-            if (visible >= 30000) {
-              hit('/portfolio/read', 'Read 30s+');
-              // Fires once. Stop the timer rather than leaving it spinning for
-              // the life of the page just to hit an early return.
+            // A while loop, not an if: coming back to a tab after a long time
+            // away can clear several rungs in one tick.
+            while (rung < RUNGS.length && visible >= RUNGS[rung][0]) {
+              hit(RUNGS[rung][1], RUNGS[rung][2]);
+              rung++;
+            }
+            if (rung >= RUNGS.length) {
+              // Top of the ladder. Stop rather than leave a timer spinning for
+              // the life of the page with nothing left to do.
               clearInterval(timer);
               document.removeEventListener('visibilitychange', tick);
             }
