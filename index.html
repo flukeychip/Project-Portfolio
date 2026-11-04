@@ -29,7 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=38" />
+  <link rel="stylesheet" href="css/style.css?v=39" />
 </head>
 <body>
 
@@ -111,12 +111,35 @@
   <footer class="site-footer">
     <div class="container">
       <span>Electrical Engineering Portfolio</span>
+
+      <!-- Stated plainly on purpose. This page is opened by people whose job
+           is to be suspicious of what their colleagues click, and undisclosed
+           measurement that someone finds in the source reads far worse than
+           measurement that was written down in the footer all along. It also
+           covers the GDPR transparency duty, which is a notice -- not a
+           banner, nothing to dismiss, nothing to click through. -->
+      <details class="privacy-note">
+        <summary>What this page measures</summary>
+        <p>
+          Which projects you scroll past or open, how long this page is actually
+          visible, whether you reach the bottom, and which tagged link you
+          arrived from. Also your screen size, timezone and browser language,
+          each counted as its own running total and never joined together or to
+          anything else. Counted by
+          <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a>:
+          no cookies, no advertising, and nothing written to your device unless
+          you use the opt-out below. Your IP address reaches GoatCounter, which
+          derives a country and region from it and does not store it. Nothing
+          here identifies you or follows you to any other site.
+          <a href="#toggle-goatcounter">Turn counting off for this browser.</a>
+        </p>
+      </details>
     </div>
   </footer>
 
   <!-- SCRIPTS -->
-  <script src="js/projects.js?v=65"></script>
-  <script src="js/main.js?v=62"></script>
+  <script src="js/projects.js?v=66"></script>
+  <script src="js/main.js?v=63"></script>
   <script>
     // Email assembled at runtime — keeps raw HTML clean from scrapers.
     // Google runs JS so it still indexes the address for search.
@@ -137,6 +160,13 @@
     // Shares one GoatCounter site with the NFC card page. Card taps land under
     // /card/*, everything here lands under /portfolio/*.
     (function () {
+      // main.js and turret-viewer.js report interactions through window.gcHit.
+      // Define it as a no-op FIRST, before any of the guards below, so every
+      // early return here -- local preview, no counter code, opted out -- still
+      // leaves those call sites safe to call unconditionally. Otherwise each
+      // one would have to repeat all three checks.
+      window.gcHit = function () {};
+
       var COUNTER_CODE = 'flukeychip';
       if (!COUNTER_CODE) return;
 
@@ -154,7 +184,14 @@
         try { return localStorage.getItem('skipgc') === '1'; } catch (e) { return false; }
       }
 
-      if (location.hash === '#toggle-goatcounter') {
+      // Runs on load with the hash present, and on hashchange, because the
+      // opt-out link in the footer only changes the hash -- it never reloads,
+      // so a load-time check alone would make that link silently do nothing.
+      //
+      // The hash is cleared again afterwards so the link works a second time:
+      // clicking it while the hash is already set fires no hashchange event.
+      function toggleCounting() {
+        if (location.hash !== '#toggle-goatcounter') return;
         try {
           var off = !skipped();
           localStorage.setItem('skipgc', off ? '1' : '0');
@@ -162,7 +199,10 @@
         } catch (e) {
           alert('Could not save that: this browser is blocking local storage.');
         }
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
       }
+      toggleCounting();
+      addEventListener('hashchange', toggleCounting);
 
       // Headless and automated browsers set navigator.webdriver. GoatCounter
       // takes a bot class in `b` from its isbot library, where 153 is
@@ -173,10 +213,31 @@
       try { BOT = navigator.webdriver === true; } catch (e) {}
 
       // Screen size, as GoatCounter wants it: width,height,scale.
+      //
+      // This, and the timezone and language in meta() below, are asked OF the
+      // visitor's device rather than volunteered by the browser as part of
+      // making the request -- which is the distinction ePrivacy Art. 5(3)
+      // turns on, so a strict reading puts them in scope for consent. They are
+      // collected anyway, as a deliberate decision, because the timezone is
+      // the only tunnel detection available here: GoatCounter locates by IP,
+      // and a VPN or a corporate egress moves that across the world while
+      // leaving the machine's own clock alone.
+      //
+      // Two things keep that decision honest, and both have to stay true:
+      //   - These are counted as separate totals and never combined into an
+      //     identifier. Each alone is low entropy; the SET is a fingerprint.
+      //   - The footer says so in plain English. If this list ever changes,
+      //     the privacy note has to change in the same commit -- a privacy
+      //     statement that quietly stops being true is worse than none, and
+      //     this site gets opened by people whose job is to check.
       var SCREEN = '';
       try {
         SCREEN = [screen.width, screen.height, window.devicePixelRatio || 1].join(',');
       } catch (e) {}
+
+      // Captured now, before cleanUrl() wipes the tag out of the address bar,
+      // so the strip cannot race the beacon.
+      var QUERY = location.search ? location.search.slice(1) : '';
 
       function hit(path, title) {
         if (skipped()) return;
@@ -186,38 +247,83 @@
             + '&t=' + encodeURIComponent(title)
             + '&r=' + encodeURIComponent(document.referrer || '');
           if (SCREEN) u += '&s=' + encodeURIComponent(SCREEN);
-          // Campaign/source tagging: ?src=resume on a printed link shows up
-          // here instead of being thrown away.
-          if (location.search) u += '&q=' + encodeURIComponent(location.search.slice(1));
+          if (QUERY) u += '&q=' + encodeURIComponent(QUERY);
           if (BOT) u += '&b=153';
           new Image().src = u;
         } catch (e) {}
+      }
+
+      function slug(v, max) {
+        return String(v).replace(/[^A-Za-z0-9_-]+/g, '-')
+                        .replace(/^-+|-+$/g, '').slice(0, max || 40);
       }
 
       // Where the visitor actually is, as opposed to where their IP exits.
       // GoatCounter locates by IP, and a VPN or a corporate egress moves that
       // across the world while leaving the machine's own clock and language
       // alone -- so an IP in one country reporting a timezone in another is a
-      // tunnel, not a traveller.
+      // tunnel, not a traveller. That is the whole reason this is here.
       //
-      // Deliberately NOT a fingerprint: both values are recorded as their own
-      // bucket and counted, never combined into an identifier for a person.
-      // Nothing is stored on the device and nothing is correlatable off this
-      // site, so the no-consent-banner position above still holds.
+      // Recorded as two counted buckets, never joined to each other or to the
+      // screen size above, and never written to the device. That keeps it a
+      // long way short of a fingerprint -- but see the note on SCREEN: a
+      // strict reading of Art. 5(3) still covers asking the device at all.
+      // The footer note names all three, and must keep naming them.
       function meta() {
         var tz = '', lang = '';
         try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
         try { lang = navigator.language || ''; } catch (e) {}
-        var clean = function (v) { return String(v).replace(/[^A-Za-z0-9_-]+/g, '-'); };
         if (tz || lang) {
-          hit('/meta/' + clean(tz || 'unknown') + '/' + clean(lang || 'unknown'),
+          hit('/meta/' + slug(tz || 'unknown') + '/' + slug(lang || 'unknown'),
               'Timezone / language');
         }
       }
 
+      // Where the visit came from, in the one case I actually know: when I put
+      // the tag in the link myself.
+      //
+      // Every application gets its own URL -- ?src=formlabs, ?src=anduril --
+      // which turns "15 visits from outside the country" into "Formlabs opened
+      // it twice, three days apart". This is the highest-value signal on the
+      // page and the cheapest: it is a URL I chose, so nothing is read from the
+      // visitor's device and nothing is stored on it.
+      //
+      // Filed as its own path as well as passed in `q`, because the query
+      // string panel is easy to overlook and needs a setting enabled, while a
+      // path is always a row on the dashboard.
+      //
+      // `s` is accepted alongside `src` because the NFC cards already in
+      // people's wallets use ?s=nfc, and those links can never be changed.
+      function source() {
+        var m = /(?:^|&)(?:src|s)=([^&]*)/.exec(QUERY);
+        if (!m) return;
+        var tag = slug(decodeURIComponent(m[1]));
+        if (tag) hit('/src/' + tag, 'Source: ' + tag);
+      }
+
+      // Take the tag out of the address bar once it is counted.
+      //
+      // It survives in any link that gets forwarded, so a forward still counts
+      // against the right tag. This is only about the address bar: a recruiter
+      // sharing their screen in an interview should not have "?src=anduril"
+      // sitting in front of the room.
+      function cleanUrl() {
+        if (!QUERY) return;
+        try {
+          history.replaceState(null, '', location.pathname + location.hash);
+        } catch (e) {}
+      }
+
+      // Everything above is in place, so let the rest of the site report
+      // interactions through this. Assigned before the load handler runs,
+      // since main.js wires its own listeners up earlier.
+      window.gcHit = hit;
+
       addEventListener('load', function () {
         hit('/portfolio', 'Portfolio');
         meta();
+        source();
+        cleanUrl();
 
         // Dwell time, as a ladder of milestones rather than a single flag.
         //
@@ -302,8 +408,59 @@
         var href = a.getAttribute('href') || '';
         if (href.indexOf('Alexander_Arens_resume.pdf') !== -1) {
           hit('/portfolio/resume', 'Resume downloaded');
+          return;
+        }
+
+        // Anything leaving the site. Today that is one link, on the NFC card
+        // project, so this will rarely fire -- it is here so that the first
+        // GitHub repo link I add starts reporting without my remembering to
+        // wire it up. Counted by host, never by full URL, so this cannot turn
+        // into a record of what a particular person browsed.
+        if (/^https?:/i.test(href)) {
+          try {
+            var host = new URL(href, location.href).hostname;
+            if (host && host !== location.hostname) {
+              hit('/portfolio/out/' + slug(host, 60), 'Left to ' + host);
+            }
+          } catch (e) {}
         }
       });
+
+      // Reaching the end of a single-page portfolio is its own signal: the
+      // section observer says which projects scrolled past and the dwell ladder
+      // says for how long, but neither says whether anyone got to the bottom.
+      //
+      // 92% rather than 100% because the footer plus a mobile browser's
+      // collapsing toolbar mean the true bottom is often never reported.
+      addEventListener('load', function () {
+        var fired = false;
+        function onScroll() {
+          if (fired) return;
+          var doc = document.documentElement;
+          var seen = window.scrollY + window.innerHeight;
+          var total = Math.max(doc.scrollHeight, document.body.scrollHeight);
+          if (total > 0 && seen / total >= 0.92) {
+            fired = true;
+            removeEventListener('scroll', onScroll);
+            hit('/portfolio/finished', 'Reached the bottom');
+          }
+        }
+        addEventListener('scroll', onScroll, { passive: true });
+      });
+
+      // Coming back to the tab a third time means someone is returning to this
+      // deliberately rather than leaving it open. Fires once, and counts only
+      // returns, so a single long read never trips it.
+      (function () {
+        var returns = 0;
+        function onVis() {
+          if (document.visibilityState !== 'visible') return;
+          if (++returns < 3) return;
+          document.removeEventListener('visibilitychange', onVis);
+          hit('/portfolio/returned', 'Came back to the tab');
+        }
+        document.addEventListener('visibilitychange', onVis);
+      })();
     })();
   </script>
 </body>

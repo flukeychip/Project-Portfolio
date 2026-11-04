@@ -252,7 +252,15 @@ const projects = [
     tagline: "Automated drink dispensing system",
     description: "Inspired by a YouTube video of an Alexa-controlled drink maker, I decided to design my own improved version over the course of a month. My system uses a custom PCB and a load cell in the base for closed-loop feedback. It's also designed for easy 3D printing and assembly.",
     skills: ["Embedded Systems", "Motor Control", "CAD", "3D Printing"],
-    model: "Drink%20dispenser/drink-dispenser.glb",
+    // No model. drink-dispenser.glb was deleted in 21fa427 when the heavy
+    // CAD was taken off GitHub, but this pointer was left behind, so every
+    // visitor who opened this project fetched GLTFLoader, requested a file
+    // that 404s, and logged "Model load error" before the gallery fell back
+    // to the photos below. The fallback always worked -- the cost was a
+    // wasted round trip and a scary console error on a page that gets read
+    // by people who check consoles. Re-export the GLB and put the path back
+    // if the 3D view is wanted again.
+    model: null,
     images: [
       "Drink%20dispenser/PCB%20Top.jpg",
       "Drink%20dispenser/PCB%20Bottom.jpg"

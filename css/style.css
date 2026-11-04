@@ -953,8 +953,35 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* The privacy note takes a whole row of its own below, so the row the name
+     sits on has to be allowed to wrap rather than squeezing it in beside. */
+  flex-wrap: wrap;
+  row-gap: 0.9rem;
   font-size: 0.85rem;
   color: var(--text-muted);
+}
+
+/* Collapsed by default: anyone looking for it finds it, and nobody reading the
+   portfolio has a paragraph of analytics policy pushed in front of them. */
+.privacy-note {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.privacy-note summary {
+  cursor: pointer;
+  width: fit-content;
+}
+
+.privacy-note p {
+  /* Held to a readable measure instead of running the full 1200px. */
+  max-width: 68ch;
+  margin: 0.6rem 0 0;
+}
+
+.privacy-note a {
+  text-decoration: underline;
 }
 
 .site-footer a {

@@ -508,6 +508,14 @@
       // Unlock scroll hijacking and exit carousel mode
       inCarouselMode = false;
       carouselDone = true;
+
+      // Choosing a card is intent; the analytics in index.html already counts
+      // a project when it scrolls past the middle of the screen, but that
+      // happens to everything on the way down the page. This separates "opened
+      // the turret on purpose" from "scrolled past the turret".
+      (window.gcHit || function () {})('/portfolio/open/' + p.id,
+                                       'Opened: ' + p.name);
+
       // Scroll to project detail
       document.getElementById(p.id).scrollIntoView({ behavior: 'smooth' });
     });
@@ -889,7 +897,7 @@
   // comes from a JSON triangle soup, not a glTF scene.
   if (pendingTurret.length > 0) {
     loadScriptsSequential(
-      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=23'],
+      ['lib/three.min.js?v=2', 'js/turret-viewer.js?v=24'],
       function () {
         pendingTurret.forEach(function (item) {
           var container = document.getElementById('3d-' + item.section.id);
@@ -994,8 +1002,19 @@
   document.addEventListener('click', function (e) {
     var vid = e.target.closest('video[data-allow-sound="true"]');
     if (!vid) return;
+    var wasMuted = vid.muted;
     vid.muted = false;
     vid.play().catch(function () {});
+
+    // Turning the sound on is a deliberate act, which makes it worth counting
+    // where a play is not: every video on this site autoplays muted, so "did
+    // it play" answers nothing. Only the first unmute per element counts.
+    if (wasMuted) {
+      var sec = vid.closest('.project-detail');
+      (window.gcHit || function () {})(
+        '/portfolio/sound/' + ((sec && sec.id) || 'unknown'),
+        'Turned sound on');
+    }
   });
 
   syncSoundEnabledVideos();

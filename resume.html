@@ -50,14 +50,39 @@
 
   // Same coarse signals as index.html: screen size, any ?src= tag on the
   // printed link, and GoatCounter's bot class 153 for automated browsers that
-  // set navigator.webdriver. No identifier is built from any of it.
+  // set navigator.webdriver. Counted as separate totals; no identifier is
+  // built from any of it, and nothing is written to the device.
+  //
+  // Timezone and language are NOT collected here, unlike index.html. They are
+  // there to catch a VPN -- an IP in one country with a clock in another --
+  // and that only means something across a whole visit. This page exists for
+  // the few hundred milliseconds before a PDF opens.
+  var query = location.search ? location.search.slice(1) : '';
   var extra = '';
   try {
     extra += '&s=' + encodeURIComponent([screen.width, screen.height,
                                          window.devicePixelRatio || 1].join(','));
   } catch (e) {}
-  if (location.search) extra += '&q=' + encodeURIComponent(location.search.slice(1));
+  if (query) extra += '&q=' + encodeURIComponent(query);
   try { if (navigator.webdriver === true) extra += '&b=153'; } catch (e) {}
+
+  // The tag gets its own counted path too, so it is a dashboard row rather
+  // than a query-string panel that has to be gone looking for.
+  var tag = /(?:^|&)(?:src|s)=([^&]*)/.exec(query);
+  if (tag) {
+    // Must match slug() in index.html exactly. If one of them stripped the
+    // separator and the other replaced it, "?src=acme corp" would land in two
+    // different dashboard rows depending on which page it was opened from.
+    var slug = decodeURIComponent(tag[1]).replace(/[^A-Za-z0-9_-]+/g, '-')
+                                         .replace(/^-+|-+$/g, '').slice(0, 40);
+    if (slug) {
+      try {
+        new Image().src = 'https://' + COUNTER_CODE + '.goatcounter.com/count'
+          + '?p=' + encodeURIComponent('/src/' + slug)
+          + '&t=' + encodeURIComponent('Source: ' + slug) + extra;
+      } catch (e) {}
+    }
+  }
 
   try {
     var img = new Image();

@@ -357,6 +357,30 @@
           self.droneEl.style.transform =
             'translate(' + (e.clientX - r.left) + 'px,' + (e.clientY - r.top) + 'px) translate(-50%,-50%)';
         }
+
+        // Count someone actually playing with the turret, once.
+        //
+        // Measured as cumulative time with the pointer inside the viewer, not
+        // as "the pointer touched it", because the viewer sits in the middle of
+        // the page and a mouse crosses it on the way to anywhere. A second and
+        // a half of tracking is someone watching it aim; a flick through is
+        // not. Accumulates across separate passes, so three short looks count.
+        if (!self.playCounted) {
+          var now = e.timeStamp || Date.now();
+          if (inside) {
+            // Gaps over 500ms are a different pass, not time spent inside.
+            var dt = self.lastInside ? now - self.lastInside : 0;
+            self.insideMs = (self.insideMs || 0) + (dt > 0 && dt < 500 ? dt : 0);
+            self.lastInside = now;
+            if (self.insideMs >= 1500) {
+              self.playCounted = true;
+              (window.gcHit || function () {})('/portfolio/turret-aimed',
+                                               'Played with the turret');
+            }
+          } else {
+            self.lastInside = 0;
+          }
+        }
       };
       document.addEventListener('pointermove', this.pointerListener);
     }
