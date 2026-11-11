@@ -85,7 +85,7 @@ const projects = [
     skills: ["PCB Design", "RF / Antenna Design", "KiCad", "NFC", "Web"],
     model: null,
     images: [
-      "NFC%20business%20card/nfc-cards.jpg",
+      "NFC%20business%20card/nfc-cards.jpg?v=2",
       "NFC%20business%20card/nfc-pcb-layout.png"
     ],
     timeline: [
